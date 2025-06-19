@@ -1,0 +1,195 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('API Endpoints', () => {
+  test.describe('Announcements API', () => {
+    test('GET /api/announcements should return announcements', async ({ request }) => {
+      const response = await request.get('/api/announcements');
+      
+      expect(response.status()).toBe(200);
+      
+      const announcements = await response.json();
+      expect(Array.isArray(announcements)).toBe(true);
+      
+      // Check that each announcement has required fields
+      if (announcements.length > 0) {
+        const announcement = announcements[0];
+        expect(announcement).toHaveProperty('id');
+        expect(announcement).toHaveProperty('title');
+        expect(announcement).toHaveProperty('content');
+        expect(announcement).toHaveProperty('type');
+        expect(announcement).toHaveProperty('author');
+        expect(announcement).toHaveProperty('date');
+        expect(announcement).toHaveProperty('priority');
+        expect(announcement).toHaveProperty('isActive');
+      }
+    });
+
+    test('GET /api/admin/announcements should return all announcements including inactive', async ({ request }) => {
+      const response = await request.get('/api/admin/announcements');
+      
+      expect(response.status()).toBe(200);
+      
+      const announcements = await response.json();
+      expect(Array.isArray(announcements)).toBe(true);
+    });
+
+    test('POST /api/announcements should create new announcement', async ({ request }) => {
+      const newAnnouncement = {
+        type: 'tip',
+        title: 'Test Announcement',
+        content: 'This is a test announcement created by Playwright',
+        author: 'Test User',
+        date: '2024-01-15',
+        priority: 'medium',
+        isActive: true
+      };
+
+      const response = await request.post('/api/announcements', {
+        data: newAnnouncement
+      });
+
+      expect(response.status()).toBe(201);
+      
+      const createdAnnouncement = await response.json();
+      expect(createdAnnouncement).toHaveProperty('id');
+      expect(createdAnnouncement.title).toBe(newAnnouncement.title);
+      expect(createdAnnouncement.content).toBe(newAnnouncement.content);
+      expect(createdAnnouncement.type).toBe(newAnnouncement.type);
+    });
+
+    test('POST /api/announcements should validate required fields', async ({ request }) => {
+      const incompleteAnnouncement = {
+        title: 'Test Announcement'
+        // Missing required fields
+      };
+
+      const response = await request.post('/api/announcements', {
+        data: incompleteAnnouncement
+      });
+
+      expect(response.status()).toBe(400);
+    });
+
+    test('PUT /api/announcements/[id] should update existing announcement', async ({ request }) => {
+      // First, create an announcement
+      const newAnnouncement = {
+        type: 'event',
+        title: 'Original Title',
+        content: 'Original content',
+        author: 'Test User',
+        date: '2024-01-15',
+        priority: 'medium',
+        isActive: true
+      };
+
+      const createResponse = await request.post('/api/announcements', {
+        data: newAnnouncement
+      });
+      
+      expect(createResponse.status()).toBe(201);
+      const created = await createResponse.json();
+
+      // Then, update it
+      const updatedAnnouncement = {
+        ...newAnnouncement,
+        title: 'Updated Title',
+        content: 'Updated content'
+      };
+
+      const updateResponse = await request.put(`/api/announcements/${created.id}`, {
+        data: updatedAnnouncement
+      });
+
+      expect(updateResponse.status()).toBe(200);
+      
+      const updated = await updateResponse.json();
+      expect(updated.title).toBe('Updated Title');
+      expect(updated.content).toBe('Updated content');
+    });
+
+    test('DELETE /api/announcements/[id] should delete announcement', async ({ request }) => {
+      // First, create an announcement
+      const newAnnouncement = {
+        type: 'order',
+        title: 'To Be Deleted',
+        content: 'This announcement will be deleted',
+        author: 'Test User',
+        date: '2024-01-15',
+        priority: 'low',
+        isActive: true
+      };
+
+      const createResponse = await request.post('/api/announcements', {
+        data: newAnnouncement
+      });
+      
+      expect(createResponse.status()).toBe(201);
+      const created = await createResponse.json();
+
+      // Then, delete it
+      const deleteResponse = await request.delete(`/api/announcements/${created.id}`);
+      expect(deleteResponse.status()).toBe(200);
+
+      // Verify it's deleted by trying to get all announcements and checking it's not there
+      const getResponse = await request.get('/api/announcements');
+      const announcements = await getResponse.json();
+      
+      const deletedAnnouncement = announcements.find((a: any) => a.id === created.id);
+      expect(deletedAnnouncement).toBeUndefined();
+    });
+
+    test('should handle non-existent announcement ID', async ({ request }) => {
+      const nonExistentId = 'non-existent-id-12345';
+      
+      const getResponse = await request.put(`/api/announcements/${nonExistentId}`, {
+        data: {
+          type: 'tip',
+          title: 'Test',
+          content: 'Test',
+          author: 'Test',
+          date: '2024-01-15',
+          priority: 'medium',
+          isActive: true
+        }
+      });
+      
+      expect(getResponse.status()).toBe(404);
+    });
+
+    test('should validate announcement type', async ({ request }) => {
+      const invalidTypeAnnouncement = {
+        type: 'invalid-type',
+        title: 'Test Announcement',
+        content: 'Test content',
+        author: 'Test User',
+        date: '2024-01-15',
+        priority: 'medium',
+        isActive: true
+      };
+
+      const response = await request.post('/api/announcements', {
+        data: invalidTypeAnnouncement
+      });
+
+      expect(response.status()).toBe(400);
+    });
+
+    test('should validate priority levels', async ({ request }) => {
+      const invalidPriorityAnnouncement = {
+        type: 'tip',
+        title: 'Test Announcement',
+        content: 'Test content',
+        author: 'Test User',
+        date: '2024-01-15',
+        priority: 'invalid-priority',
+        isActive: true
+      };
+
+      const response = await request.post('/api/announcements', {
+        data: invalidPriorityAnnouncement
+      });
+
+      expect(response.status()).toBe(400);
+    });
+  });
+});

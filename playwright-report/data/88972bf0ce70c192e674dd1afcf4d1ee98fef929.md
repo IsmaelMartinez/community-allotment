@@ -1,0 +1,59 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - heading "🌱 Community Allotment" [level=1]
+    - link "Home":
+      - /url: /
+    - link "Announcements":
+      - /url: /announcements
+    - link "Calendar":
+      - /url: /calendar
+    - link "Plant Advisor":
+      - /url: /ai-advisor
+    - link "Admin":
+      - /url: /admin
+- main:
+  - heading "📢 Community Announcements" [level=1]
+  - paragraph: Stay up to date with the latest news, deliveries, orders, and gardening tips from your allotment community.
+  - img
+  - text: Never miss an announcement!
+  - button "Subscribe to Notifications"
+  - button "All"
+  - button "Deliveries"
+  - button "Orders"
+  - button "Tips"
+  - button "Events"
+  - img
+  - text: Delivery HIGH
+  - heading "Bark Mulch Delivery - This Saturday" [level=2]
+  - text: 2025-06-16 by Admin
+  - paragraph: Fresh bark mulch delivery scheduled for Saturday, June 21st at 9:00 AM. Please bring your wheelbarrow and gloves. The delivery will be at the main entrance.
+  - button "👍 Helpful (12)"
+  - button "💬 Comment"
+  - button "📤 Share"
+  - button "🔖 Save"
+  - img
+  - text: Order MEDIUM
+  - heading "Summer Seed Order Deadline" [level=2]
+  - text: 2025-06-15 by Plot Manager
+  - paragraph: Last chance to place your summer seed orders! Deadline is this Friday, June 20th. Order forms are available at the community center or download from our website.
+  - button "👍 Helpful (12)"
+  - button "💬 Comment"
+  - button "📤 Share"
+  - button "🔖 Save"
+  - img
+  - text: Gardening Tip LOW
+  - heading "June Gardening Tips" [level=2]
+  - text: 2025-06-12 by Garden Expert
+  - paragraph: Time to plant summer vegetables like tomatoes, peppers, and squash. Remember to water deeply in the early morning and mulch around plants to retain moisture. Watch out for aphids on new growth!
+  - button "👍 Helpful (12)"
+  - button "💬 Comment"
+  - button "📤 Share"
+  - button "🔖 Save"
+  - button "Load More Announcements"
+- contentinfo:
+  - paragraph: © 2025 Community Allotment Association. Growing together! 🌿
+- alert
+```

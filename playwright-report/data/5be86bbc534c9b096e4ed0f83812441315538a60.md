@@ -1,0 +1,135 @@
+# Page snapshot
+
+```yaml
+- dialog "Unhandled Runtime Error":
+  - navigation:
+    - button "previous" [disabled]:
+      - img "previous"
+    - button "next" [disabled]:
+      - img "next"
+    - text: 1 of 1 error Next.js (14.2.5) is outdated
+    - link "(learn more)":
+      - /url: https://nextjs.org/docs/messages/version-staleness
+  - button "Close"
+  - heading "Unhandled Runtime Error" [level=1]
+  - paragraph: "Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports. Check the render method of `AnnouncementsPage`."
+  - heading "Call Stack" [level=2]
+  - group:
+    - img
+    - img
+    - text: React
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - group:
+    - img
+    - img
+    - text: React
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - group:
+    - img
+    - img
+    - text: React
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - group:
+    - img
+    - img
+    - text: React
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - group:
+    - img
+    - img
+    - text: React
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "fn" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (371:21)
+  - heading "<unknown>" [level=3]
+  - text: webpack:/src/client/app-next-dev.ts
+  - heading "callback" [level=3]
+  - text: webpack:/src/client/app-bootstrap.ts
+  - heading "hydrate" [level=3]
+  - text: webpack:/src/client/app-bootstrap.ts
+  - heading "self" [level=3]
+  - text: webpack:/src/client/app-bootstrap.ts
+  - heading "<unknown>" [level=3]
+  - text: webpack:/src/client/app-next-dev.ts
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "options.factory" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/webpack.js (715:31)
+  - group:
+    - img
+    - img
+    - text: Next.js
+  - heading "<unknown>" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/main-app.js (1986:154)
+  - heading "<unknown>" [level=3]
+  - text: webpackJsonpCallback@http://localhost:3000/_next/static/chunks/webpack.js?v=1750323629997 (1387:46)
+  - heading "<unknown>" [level=3]
+  - text: file:/Users/ismael.martinez/projects/github/community-allotment/.next/static/chunks/main-app.js (9:61)
+```

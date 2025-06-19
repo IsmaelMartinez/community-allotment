@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - heading "🌱 Community Allotment" [level=1]
+    - link "Home":
+      - /url: /
+    - link "Announcements":
+      - /url: /announcements
+    - link "Calendar":
+      - /url: /calendar
+    - link "Plant Advisor":
+      - /url: /ai-advisor
+    - link "Admin":
+      - /url: /admin
+- main:
+  - heading "📢 Community Announcements" [level=1]
+  - paragraph: Stay up to date with the latest news, deliveries, orders, and gardening tips from your allotment community.
+  - img
+  - text: Never miss an announcement!
+  - button "Subscribe to Notifications"
+  - button "All"
+  - button "Deliveries"
+  - button "Orders"
+  - button "Tips"
+  - button "Events"
+  - img
+  - text: Delivery HIGH
+  - heading "Bark Mulch Delivery - This Saturday" [level=2]
+  - text: 2025-06-16 by Admin
+  - paragraph: Fresh bark mulch delivery scheduled for Saturday, June 21st at 9:00 AM. Please bring your wheelbarrow and gloves. The delivery will be at the main entrance.
+  - button "👍 Helpful (12)"
+  - button "💬 Comment"
+  - button "📤 Share"
+  - button "🔖 Save"
+  - button "Load More Announcements"
+- contentinfo:
+  - paragraph: © 2025 Community Allotment Association. Growing together! 🌿
+- alert
+```

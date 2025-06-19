@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - heading "🌱 Community Allotment" [level=1]
+    - link "Home":
+      - /url: /
+    - link "Announcements":
+      - /url: /announcements
+    - link "Calendar":
+      - /url: /calendar
+    - link "Plant Advisor":
+      - /url: /ai-advisor
+    - link "Admin":
+      - /url: /admin
+- main:
+  - heading "⚙️ Admin Dashboard" [level=1]
+  - paragraph: Manage announcements, users, and system settings for your allotment community.
+  - img
+  - text: 156 Total Users
+  - img
+  - text: 124 Active Subscriptions
+  - img
+  - text: 12 Announcements This Month
+  - img
+  - text: 78% Avg. Engagement Rate
+  - navigation:
+    - button "Announcements":
+      - img
+      - text: Announcements
+    - button "Users":
+      - img
+      - text: Users
+    - button "Settings":
+      - img
+      - text: Settings
+  - heading "System Settings" [level=2]
+  - heading "Notification Settings" [level=3]
+  - text: Email Notifications Send email notifications for new announcements
+  - checkbox [checked]
+  - text: SMS Notifications Send SMS for urgent announcements
+  - checkbox
+  - text: Auto-publish Seasonal Tips Automatically publish monthly gardening tips
+  - checkbox [checked]
+  - heading "AI Advisor Settings" [level=3]
+  - text: AI Model Provider
+  - combobox:
+    - option "OpenAI GPT-4 (Plant Specialist)" [selected]
+    - option "Anthropic Claude (Garden Expert)"
+    - option "Custom Plant Model"
+  - text: Response Length
+  - combobox:
+    - option "Detailed (Recommended)" [selected]
+    - option "Concise"
+    - option "Brief"
+  - text: Include Weather Data Use local weather in AI responses
+  - checkbox [checked]
+- contentinfo:
+  - paragraph: © 2025 Community Allotment Association. Growing together! 🌿
+- alert
+```
