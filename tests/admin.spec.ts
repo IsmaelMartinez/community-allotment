@@ -18,11 +18,11 @@ test.describe('Admin Dashboard', () => {
     await expect(page.getByText('Announcements This Month')).toBeVisible();
     await expect(page.getByText('Avg. Engagement Rate')).toBeVisible();
     
-    // Check for stats values
-    await expect(page.getByText('156')).toBeVisible();
-    await expect(page.getByText('124')).toBeVisible();
-    await expect(page.getByText('12')).toBeVisible();
-    await expect(page.getByText('78%')).toBeVisible();
+    // Check for stats values using test IDs to avoid ambiguity
+    await expect(page.getByTestId('stat-total-users-value')).toHaveText('156');
+    await expect(page.getByTestId('stat-active-subscriptions-value')).toHaveText('124');
+    await expect(page.getByTestId('stat-announcements-this-month-value')).toHaveText('12');
+    await expect(page.getByTestId('stat-avg.-engagement-rate-value')).toHaveText('78%');
   });
 
   test('should display navigation tabs', async ({ page }) => {
@@ -61,15 +61,15 @@ test.describe('Admin Dashboard', () => {
 
   test('should display type badges with correct styling', async ({ page }) => {
     // Check delivery type badge
-    const deliveryBadge = page.locator('text=delivery').first();
+    const deliveryBadge = page.getByTestId('type-badge-delivery');
     await expect(deliveryBadge).toHaveClass(/bg-orange-100/);
     
     // Check order type badge
-    const orderBadge = page.locator('text=order').first();
+    const orderBadge = page.getByTestId('type-badge-order');
     await expect(orderBadge).toHaveClass(/bg-blue-100/);
     
     // Check event type badge
-    const eventBadge = page.locator('text=event').first();
+    const eventBadge = page.getByTestId('type-badge-event');
     await expect(eventBadge).toHaveClass(/bg-purple-100/);
   });
 

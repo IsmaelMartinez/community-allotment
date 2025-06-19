@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Truck, Package, Users, Sprout } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Truck, Package, Users, Sprout } from 'lucide-react'
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',

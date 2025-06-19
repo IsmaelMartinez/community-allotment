@@ -11,8 +11,8 @@ test.describe('Homepage and Navigation', () => {
   test('should navigate to announcements page', async ({ page }) => {
     await page.goto('/');
     
-    // Look for navigation link to announcements
-    const announcementsLink = page.getByRole('link', { name: /Announcements/ });
+    // Look for navigation link to announcements (exact match in header)
+    const announcementsLink = page.getByRole('link', { name: 'Announcements', exact: true });
     if (await announcementsLink.isVisible()) {
       await announcementsLink.click();
       await expect(page).toHaveURL('/announcements');
@@ -46,8 +46,8 @@ test.describe('Homepage and Navigation', () => {
   test('should navigate to calendar page', async ({ page }) => {
     await page.goto('/');
     
-    // Look for navigation link to calendar
-    const calendarLink = page.getByRole('link', { name: /Calendar/ });
+    // Look for navigation link to calendar (exact match in header)
+    const calendarLink = page.getByRole('link', { name: 'Calendar', exact: true });
     if (await calendarLink.isVisible()) {
       await calendarLink.click();
       await expect(page).toHaveURL('/calendar');

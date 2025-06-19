@@ -36,7 +36,7 @@ test.describe('Announcements Page', () => {
       // Check first announcement has required elements
       const firstCard = announcementCards.first();
       await expect(firstCard).toBeVisible();
-      await expect(firstCard.locator('h3')).toBeVisible(); // Title
+      await expect(firstCard.locator('h2')).toBeVisible(); // Title
       await expect(firstCard.locator('p')).toBeVisible(); // Content
     }
   });

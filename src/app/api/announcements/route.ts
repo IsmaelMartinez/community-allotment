@@ -64,6 +64,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Validate announcement type
+    const validTypes = ['delivery', 'order', 'tip', 'event']
+    if (!validTypes.includes(type)) {
+      return NextResponse.json({ error: 'Invalid announcement type' }, { status: 400 })
+    }
+
+    // Validate priority level
+    const validPriorities = ['high', 'medium', 'low']
+    if (priority && !validPriorities.includes(priority)) {
+      return NextResponse.json({ error: 'Invalid priority level' }, { status: 400 })
+    }
+
     const announcements = await readAnnouncements()
     const newAnnouncement: Announcement = {
       id: Date.now().toString(),
@@ -72,7 +84,7 @@ export async function POST(request: NextRequest) {
       content,
       author,
       date: new Date().toISOString().split('T')[0],
-      priority: priority || 'medium',
+      priority: priority ?? 'medium',
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

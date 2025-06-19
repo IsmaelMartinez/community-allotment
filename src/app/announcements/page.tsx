@@ -98,7 +98,7 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-lg transition ${
               filter === 'all' 
-                ? 'bg-primary-600 text-white' 
+                ? 'bg-primary-500 text-white' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -108,7 +108,7 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter('delivery')}
             className={`px-4 py-2 rounded-lg transition ${
               filter === 'delivery' 
-                ? 'bg-primary-600 text-white' 
+                ? 'bg-orange-500 text-white' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -118,7 +118,7 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter('order')}
             className={`px-4 py-2 rounded-lg transition ${
               filter === 'order' 
-                ? 'bg-primary-600 text-white' 
+                ? 'bg-blue-500 text-white' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -128,7 +128,7 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter('tip')}
             className={`px-4 py-2 rounded-lg transition ${
               filter === 'tip' 
-                ? 'bg-primary-600 text-white' 
+                ? 'bg-green-500 text-white' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -138,7 +138,7 @@ export default function AnnouncementsPage() {
             onClick={() => setFilter('event')}
             className={`px-4 py-2 rounded-lg transition ${
               filter === 'event' 
-                ? 'bg-primary-600 text-white' 
+                ? 'bg-purple-500 text-white' 
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -160,7 +160,7 @@ export default function AnnouncementsPage() {
           </div>
         ) : (
           filteredAnnouncements.map((announcement) => {
-            const IconComponent = typeIcons[announcement.type]
+            const IconComponent = typeIcons[announcement.type] || Bell // Fallback to Bell icon if undefined
             const colorClass = typeColors[announcement.type]
             return (
               <div key={announcement.id} data-testid="announcement-card" className="bg-white rounded-lg shadow-md border-l-4 border-l-gray-300 overflow-hidden">
