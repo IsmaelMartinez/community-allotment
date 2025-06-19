@@ -152,10 +152,135 @@ export default function AdminPage() {
   const renderUsersTab = () => (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">User Management</h2>
+        <h2 className="text-xl font-semibold">Manage Users</h2>
         <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition">
           Export User List
         </button>
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Joined
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">John Smith</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">john.smith@email.com</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-blue-100 text-blue-800 border-blue-200">
+                    Member
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  2025-06-01
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-green-100 text-green-800 border-green-200">
+                    Active
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex items-center space-x-2">
+                    <button className="text-primary-600 hover:text-primary-700">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="text-red-600 hover:text-red-700">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">Sarah Johnson</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">sarah.johnson@email.com</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-purple-100 text-purple-800 border-purple-200">
+                    Admin
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  2025-05-15
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-green-100 text-green-800 border-green-200">
+                    Active
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex items-center space-x-2">
+                    <button className="text-primary-600 hover:text-primary-700">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="text-red-600 hover:text-red-700">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">Mike Wilson</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">mike.wilson@email.com</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-blue-100 text-blue-800 border-blue-200">
+                    Member
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  2025-06-10
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-2 py-1 text-xs font-medium rounded-full border bg-green-100 text-green-800 border-green-200">
+                    Active
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex items-center space-x-2">
+                    <button className="text-primary-600 hover:text-primary-700">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button className="text-red-600 hover:text-red-700">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -208,7 +333,7 @@ export default function AdminPage() {
 
   const renderSettingsTab = () => (
     <div>
-      <h2 className="text-xl font-semibold mb-6">System Settings</h2>
+      <h2 className="text-xl font-semibold mb-6">Platform Settings</h2>
       
       <div className="space-y-6">
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -242,20 +367,20 @@ export default function AdminPage() {
           <h3 className="text-lg font-medium mb-4">AI Advisor Settings</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="ai-provider" className="block text-sm font-medium text-gray-700 mb-2">
                 AI Model Provider
               </label>
-              <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <select id="ai-provider" className="w-full border border-gray-300 rounded-lg px-3 py-2">
                 <option>OpenAI GPT-4 (Plant Specialist)</option>
                 <option>Anthropic Claude (Garden Expert)</option>
                 <option>Custom Plant Model</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="response-length" className="block text-sm font-medium text-gray-700 mb-2">
                 Response Length
               </label>
-              <select className="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <select id="response-length" className="w-full border border-gray-300 rounded-lg px-3 py-2">
                 <option>Detailed (Recommended)</option>
                 <option>Concise</option>
                 <option>Brief</option>
@@ -270,6 +395,64 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">Content Moderation</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Auto-approve Member Posts</div>
+                <div className="text-sm text-gray-600">Automatically approve posts from verified members</div>
+              </div>
+              <input type="checkbox" className="toggle" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Profanity Filter</div>
+                <div className="text-sm text-gray-600">Filter inappropriate language in announcements</div>
+              </div>
+              <input type="checkbox" className="toggle" defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Manual Review Required</div>
+                <div className="text-sm text-gray-600">All announcements require admin approval</div>
+              </div>
+              <input type="checkbox" className="toggle" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">System Configuration</h3>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
+                Default Timezone
+              </label>
+              <select id="timezone" className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                <option>GMT (Greenwich Mean Time)</option>
+                <option>EST (Eastern Standard Time)</option>
+                <option>PST (Pacific Standard Time)</option>
+                <option>CET (Central European Time)</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Maintenance Mode</div>
+                <div className="text-sm text-gray-600">Put the system in maintenance mode</div>
+              </div>
+              <input type="checkbox" className="toggle" />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Debug Logging</div>
+                <div className="text-sm text-gray-600">Enable detailed system logs</div>
+              </div>
+              <input type="checkbox" className="toggle" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -278,9 +461,9 @@ export default function AdminPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">⚙️ Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">🔧 Admin Dashboard</h1>
         <p className="text-gray-600">
-          Manage announcements, users, and system settings for your allotment community.
+          Manage your allotment community platform
         </p>
       </div>
 
@@ -289,13 +472,13 @@ export default function AdminPage() {
         {stats.map((stat, index) => {
           const IconComponent = stat.icon
           return (
-            <div key={index} className="bg-white rounded-lg shadow-md p-6">
+            <div key={`stat-${stat.label.replace(/\s+/g, '-').toLowerCase()}`} className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center">
                 <div className={`p-3 rounded-lg ${stat.color} text-white mr-4`}>
                   <IconComponent className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">{stat.value}</div>
+                  <div data-testid={`stat-${stat.label.replace(/\s+/g, '-').toLowerCase()}-value`} className="text-2xl font-bold text-gray-800">{stat.value}</div>
                   <div className="text-gray-600">{stat.label}</div>
                 </div>
               </div>

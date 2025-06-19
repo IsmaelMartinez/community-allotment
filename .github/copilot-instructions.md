@@ -18,6 +18,13 @@ This is a Next.js application for managing an allotment association community. T
 - Lucide React for icons
 - App Router for modern Next.js routing
 
+## Prerequisites:
+- Node.js 18+ installed
+- npm or yarn package manager
+- Git repository initialized and connected to GitHub
+- **Playwright tests must pass**: Run `npm run test` to ensure all tests are passing before making changes
+- Run `npm run dev` to start the development server on http://localhost:3000
+
 ## Code Conventions:
 - Use TypeScript for all components and utilities
 - Follow Next.js App Router patterns
