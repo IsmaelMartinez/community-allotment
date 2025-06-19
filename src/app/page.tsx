@@ -66,7 +66,7 @@ export default function Home() {
           </div>
           <div className="border-l-4 border-blue-500 pl-4">
             <h3 className="font-semibold text-lg">📝 Seed Order Deadline</h3>
-            <p className="text-gray-600">Don't forget to submit your seed orders by Friday. Spring catalog available in the community center.</p>
+            <p className="text-gray-600">Don&apos;t forget to submit your seed orders by Friday. Spring catalog available in the community center.</p>
             <span className="text-sm text-gray-500">1 week ago</span>
           </div>
           <div className="border-l-4 border-green-500 pl-4">
