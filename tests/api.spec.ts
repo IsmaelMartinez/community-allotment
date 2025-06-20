@@ -214,6 +214,9 @@ test.describe('API Endpoints', () => {
       const deleteResponse = await request.delete(`/api/announcements/${created.id}`);
       expect(deleteResponse.status()).toBe(200);
 
+      // Add a small delay to ensure file write operations complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Verify it's deleted by trying to get all announcements and checking it's not there
       const getResponse = await request.get('/api/announcements');
       const announcements = await getResponse.json();
