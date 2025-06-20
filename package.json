@@ -1,6 +1,23 @@
 {
   "name": "community-allotment",
   "version": "0.1.0",
+  "description": "A Next.js application for managing allotment community announcements, events, and AI-powered gardening advice. Built entirely using Claude Sonnet AI via VS Code agent mode. Free for personal and educational use.",
+  "license": "SEE LICENSE FILE - Creator retains commercial rights, others non-commercial use only",
+  "author": "Created by Claude Sonnet (Anthropic AI)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IsmaelMartinez/community-allotment.git"
+  },
+  "keywords": [
+    "allotment",
+    "community",
+    "gardening",
+    "ai",
+    "nextjs",
+    "typescript",
+    "ai-generated",
+    "claude-sonnet"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -25,8 +42,6 @@
     "postcss": "^8.5.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.4.17"
   },

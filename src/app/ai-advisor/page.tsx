@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Send, Leaf, Sun, Cloud, Bug, Sprout, Calendar, Settings, Eye, EyeOff, Shield, Camera, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import Image from 'next/image'
 
 const quickTopics = [
   { icon: Sprout, title: 'Planting Guide', query: 'What should I plant in my allotment this month?' },
@@ -71,7 +72,7 @@ const sampleConversation = [
   {
     id: '2',
     role: 'assistant',
-    content: 'Hello! I\'m Aitor, your gardening specialist. Let me help you with those yellowing tomato leaves.\n\n🌱 **What you\'re seeing is quite common** and usually manageable! Yellow lower leaves on tomatoes can indicate several things:\n\n**Most likely causes:**\n• **Natural aging** - Lower leaves naturally yellow and drop as the plant matures and focuses energy on upper growth\n• **Watering inconsistency** - Both overwatering and underwatering can cause yellowing\n• **Nitrogen deficiency** - The plant may be using up nutrients as it grows\n\n**Recommended actions:**\n• Remove the yellow leaves to prevent potential disease spread\n• Check soil moisture - aim for consistently moist (not soggy) soil\n• Apply a balanced tomato fertilizer to boost nutrition\n• Add mulch around the base to help retain moisture\n\n**When to be concerned:** If yellowing spreads rapidly up the plant or you notice dark spots/wilting, it could indicate blight or other diseases.\n\n📸 **Pro tip**: Upload a photo of your tomato plants using the camera button below for more specific visual diagnosis!\n\nCould you tell me your location and what the weather has been like recently? This will help me give you more specific advice for your growing conditions!'
+    content: 'Hello! I\'m Aitor, your gardening specialist. Let me help you with those yellowing tomato leaves.\n\n🌱 **What you\'re seeing is quite common** and usually manageable! Yellow lower leaves on tomatoes can indicate several things:\n\n**Most likely causes:**\n• **Natural aging** - Lower leaves naturally yellow and drop as the plant matures and focuses energy on upper growth\n• **Watering inconsistency** - Both overwatering and underwatering can cause yellowing\n• **Nitrogen deficiency** - The plant may be using up nutrients as it grows\n\n**Recommended actions:**\n• Remove the yellow leaves to prevent potential disease spread\n• Check soil moisture - aim for consistently moist (not soggy) soil\n• Apply a balanced tomato fertilizer to boost nutrition\n• Add mulch around the base to help retain moisture\n\n**When to be concerned:** If yellowing spreads rapidly up the plant or you notice dark spots/wilting, it could indicate blight or other diseases.\n\n📸 **Pro tip**: Upload a photo of your tomato plants using the camera button below for more specific visual diagnosis!\n\nI can see from your location that it\'s currently summer in your area - this is actually a great time to address these issues before the main harvest season. The warm weather means your plants are actively growing and can recover quickly with proper care!'
   }
 ]
 
@@ -83,16 +84,106 @@ export default function AIAdvisorPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
+  // Location and time detection state
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number
+    longitude: number
+    city?: string
+    country?: string
+    timezone?: string
+  } | null>(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
+  
   // Token configuration state
   const [showSettings, setShowSettings] = useState(false)
   const [apiToken, setApiToken] = useState('')
   const [showToken, setShowToken] = useState(false)
   
-  // Load token from session storage on mount
+  // Load token from session storage on mount and detect location
   useEffect(() => {
     const savedToken = sessionStorage.getItem('aitor_api_token')
     if (savedToken) setApiToken(savedToken)
+    
+    // Request user's location
+    detectUserLocation()
   }, [])
+  
+  // Detect user's location using browser APIs
+  const detectUserLocation = async () => {
+    try {
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        setLocationError('Geolocation is not supported by this browser')
+        return
+      }
+      
+      // Get user's position
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords
+          
+          try {
+            // Use reverse geocoding to get city/country info
+            // Using a free service for demonstration - in production, consider using a more robust service
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            )
+            
+            if (response.ok) {
+              const data = await response.json()
+              setUserLocation({
+                latitude,
+                longitude,
+                city: data.city ?? data.locality,
+                country: data.countryName,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+              })
+            } else {
+              // Fallback with just coordinates and timezone
+              setUserLocation({
+                latitude,
+                longitude,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+              })
+            }
+          } catch (error) {
+            console.error('Error getting location details:', error)
+            // Fallback with just coordinates and timezone
+            setUserLocation({
+              latitude,
+              longitude,
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            })
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error)
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              setLocationError('Location access denied by user')
+              break
+            case error.POSITION_UNAVAILABLE:
+              setLocationError('Location information unavailable')
+              break
+            case error.TIMEOUT:
+              setLocationError('Location request timed out')
+              break
+            default:
+              setLocationError('An unknown error occurred while detecting location')
+              break
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // Cache position for 5 minutes
+        }
+      )
+    } catch (error) {
+      console.error('Error detecting location:', error)
+      setLocationError('Failed to detect location')
+    }
+  }
   
   // Save token to session storage
   const saveTokenConfig = () => {
@@ -186,9 +277,38 @@ export default function AIAdvisorPage() {
         headers['x-openai-token'] = storedToken
       }
 
+      // Prepare enhanced message with location and time context
+      let enhancedQuery = query
+      
+      // Add location context if available
+      if (userLocation) {
+        const currentDate = new Date()
+        const timeInfo = currentDate.toLocaleString('en-US', {
+          timeZone: userLocation.timezone,
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        })
+        
+        let locationString = ''
+        if (userLocation.city && userLocation.country) {
+          locationString = `${userLocation.city}, ${userLocation.country}`
+        } else if (userLocation.country) {
+          locationString = userLocation.country
+        } else {
+          locationString = `${userLocation.latitude.toFixed(2)}°, ${userLocation.longitude.toFixed(2)}°`
+        }
+        
+        enhancedQuery = `[CONTEXT: User is located in ${locationString}, current local time: ${timeInfo}]\n\n${query}`
+      }
+
       // Prepare request body
       const requestBody: any = {
-        message: query,
+        message: enhancedQuery,
         messages: messages // Send conversation history for context
       }
 
@@ -272,10 +392,58 @@ export default function AIAdvisorPage() {
             </button>
           </div>
         </div>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-4">
           Aitor is your friendly allotment expert, ready to help you grow healthy, thriving gardens
           with personalized advice for your location and season.
         </p>
+        
+        {/* Location Status */}
+        <div className="mb-6">
+          {(() => {
+            if (userLocation) {
+              return (
+                <div className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  📍 {userLocation.city && userLocation.country 
+                    ? `${userLocation.city}, ${userLocation.country}` 
+                    : 'Location detected'}
+                  {userLocation.timezone && (
+                    <span className="ml-2 text-green-600">
+                      • {new Date().toLocaleTimeString('en-US', {
+                        timeZone: userLocation.timezone,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZoneName: 'short'
+                      })}
+                    </span>
+                  )}
+                </div>
+              )
+            }
+            
+            if (locationError) {
+              return (
+                <div className="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+                  <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                  ⚠️ {locationError}
+                  <button 
+                    onClick={detectUserLocation}
+                    className="ml-2 text-yellow-700 hover:text-yellow-900 underline text-xs"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )
+            }
+            
+            return (
+              <div className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+                {' '}🌍 Detecting location...
+              </div>
+            )
+          })()}
+        </div>
         
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center mb-2">
@@ -342,7 +510,7 @@ export default function AIAdvisorPage() {
                 <div className="ml-2">
                   <p className="text-sm text-yellow-800">
                     <strong>Privacy Notice:</strong> Your token is stored only in your browser session and never saved permanently. 
-                    It's sent securely to OpenAI only when making requests.
+                    It&apos;s sent securely to OpenAI only when making requests.
                   </p>
                 </div>
               </div>
@@ -417,11 +585,14 @@ export default function AIAdvisorPage() {
                     {/* Display image if present */}
                     {(message as any).image && (
                       <div className="mb-2">
-                        <img 
+                        <Image 
                           src={(message as any).image} 
                           alt="Plant for analysis" 
                           className="max-w-full h-auto rounded border"
                           style={{ maxHeight: '200px' }}
+                          width={400}
+                          height={200}
+                          unoptimized={true}
                         />
                       </div>
                     )}
@@ -457,11 +628,14 @@ export default function AIAdvisorPage() {
           {/* Image preview and upload */}
           {imagePreview && (
             <div className="mb-4 relative inline-block">
-              <img 
+              <Image 
                 src={imagePreview} 
                 alt="Plant for analysis"
                 className="max-w-xs h-auto rounded border"
                 style={{ maxHeight: '150px' }}
+                width={300}
+                height={150}
+                unoptimized={true}
               />
               <button
                 onClick={removeImage}

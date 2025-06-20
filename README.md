@@ -4,6 +4,12 @@
 
 Welcome to the most delightfully overengineered solution to the age-old problem of "Did anyone mention when the compost delivery is arriving?" Now featuring **actual AI** (not just your neighbor Dave pretending to know about soil pH).
 
+## 🤖 AI-Generated Code Disclaimer
+
+**This entire project was created using Claude Sonnet (Anthropic's AI assistant) via VS Code's agent mode.** Every line of code, configuration, test, and documentation was generated through AI assistance, demonstrating the current capabilities of AI-powered software development.
+
+This serves as an example of what's possible when AI agents have access to development tools and can iterate on complex projects. The code quality, architecture decisions, and feature implementations represent the state of AI coding capabilities as of June 2025. I did guide the AI, as it does like to be a bit too creative at times, and too lazy at others, but the AI did the heavy lifting.
+
 ## 🎉 What Does This Thing Actually Do?
 
 Ever been to a community allotment meeting? Remember that chaos when someone mentioned bark chips and everyone suddenly became a logistics expert? Well, we've digitized that beautiful madness!
@@ -135,9 +141,68 @@ Where the magic happens and the announcements get born. Admin access required (s
 4. Test it (please, for the love of all things green)
 5. Send us a pull request with your improvements
 
-## 📜 Legal Mumbo Jumbo
+## 📜 License & Usage Policy
 
-MIT License - which basically means "do whatever you want, just don't blame us if your digital allotment catches fire."
+This project is **free for personal and educational use** but includes important restrictions to keep it sustainable and prevent abuse.
+
+### 🚫 **What You CAN'T Do**
+- **Create competing commercial services** using this code
+- **Charge users** for access to features or AI functionality  
+- **Use this code** for any commercial purpose without explicit permission
+
+### ✅ **What You CAN Do**  
+- **Use it for your community** allotment, garden club, or personal projects
+- **Learn from the code** and improve your programming skills
+- **Contribute improvements** back to this project via pull requests
+- **Run your own instance** for personal, educational, or community use
+- **Modify and customize** for your specific gardening community needs
+
+### 🔑 **AI Token Policy**
+
+The AI gardening advisor requires users to **provide their own OpenAI API tokens**:
+
+- 🎯 **No service costs** - users pay OpenAI directly for their AI usage
+- � **Private tokens** - stored only in your browser session, never on our servers
+- ⚡ **Unlimited usage** - no artificial limits since you control your own costs
+- 💰 **Cost transparency** - you see exactly what you pay (~$0.02-0.05 per query)
+
+This approach keeps the service completely free while giving users full control over their AI usage and costs.
+
+### 📄 **Custom License with Future Flexibility**
+
+This project uses a **Custom License** that provides maximum flexibility:
+
+**For Third Parties (Everyone Else):**
+- ✅ Personal and educational use  
+- ✅ Community gardening projects
+- ✅ Learning and skill development
+- ✅ Contributing improvements back to the project
+- ❌ Commercial use or creating competing services
+- ❌ Charging users for access to features
+
+**For Original Creator (Project Owner):**
+- ✅ **Full commercial rights retained**
+- ✅ **Can monetize features** in the future if desired
+- ✅ **Can offer paid tiers** or subscriptions  
+- ✅ **Can license commercially** to businesses
+- ✅ **Complete flexibility** for future business models
+
+**Need commercial licensing?** Third parties can contact the project maintainer for a separate commercial license agreement.
+
+### 🤔 **Why This License Choice?**
+
+We chose this approach because:
+
+- **🌍 Keeps It Free**: The core service remains free for actual gardeners and communities
+- **🛡️ Prevents Exploitation**: Stops others from taking the code and creating paid competing services  
+- **💰 Future-Proof**: Project owner retains full commercial rights for future monetization
+- **🤝 Community Focused**: Encourages contributions while maintaining project sustainability
+- **⚖️ Maximum Flexibility**: Creator can pivot to any business model without legal constraints
+- **🔓 Open for Learning**: Code remains available for educational and personal use
+
+### 📋 **Full License Text**
+
+See the [LICENSE](./LICENSE) file for the complete license terms and legal details.
 
 ---
 
