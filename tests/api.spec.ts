@@ -2,9 +2,6 @@ import { test, expect } from '@playwright/test';
 import { promises as fs } from 'fs'
 import path from 'path'
 
-// Remove serial mode since we're fixing parallel execution
-// test.describe.configure({ mode: 'serial' });
-
 const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
 const BACKUP_FILE = path.join(process.cwd(), 'data', 'announcements-demo-backup.json')
 
@@ -12,20 +9,18 @@ const BACKUP_FILE = path.join(process.cwd(), 'data', 'announcements-demo-backup.
 async function getTestDataFile(testInfo: any) {
   const workerId = testInfo.workerIndex ?? 0
   const testDataFile = path.join(process.cwd(), 'data', `announcements-test-${workerId}.json`)
-  
+
   // Copy backup data to test-specific file
   const backupData = await fs.readFile(BACKUP_FILE, 'utf-8')
   await fs.writeFile(testDataFile, backupData)
-  
+
   return testDataFile
 }
 
-// Helper to cleanup test data file
 async function cleanupTestDataFile(testDataFile: string) {
   try {
     await fs.unlink(testDataFile)
   } catch (error) {
-    // Ignore if file doesn't exist
     console.debug('Test data file already cleaned up:', error)
   }
 }
@@ -61,12 +56,12 @@ test.describe('API Endpoints', () => {
     })
     test('GET /api/announcements should return announcements', async ({ request }) => {
       const response = await request.get('/api/announcements');
-      
+
       expect(response.status()).toBe(200);
-      
+
       const announcements = await response.json();
       expect(Array.isArray(announcements)).toBe(true);
-      
+
       // Check that each announcement has required fields
       if (announcements.length > 0) {
         const announcement = announcements[0];
@@ -83,9 +78,9 @@ test.describe('API Endpoints', () => {
 
     test('GET /api/admin/announcements should return all announcements including inactive', async ({ request }) => {
       const response = await request.get('/api/admin/announcements');
-      
+
       expect(response.status()).toBe(200);
-      
+
       const announcements = await response.json();
       expect(Array.isArray(announcements)).toBe(true);
     });
@@ -106,7 +101,7 @@ test.describe('API Endpoints', () => {
       });
 
       expect(response.status()).toBe(201);
-      
+
       const createdAnnouncement = await response.json();
       expect(createdAnnouncement).toHaveProperty('id');
       expect(createdAnnouncement.title).toBe(newAnnouncement.title);
@@ -142,10 +137,10 @@ test.describe('API Endpoints', () => {
       const createResponse = await request.post('/api/announcements', {
         data: newAnnouncement
       });
-      
+
       expect(createResponse.status()).toBe(201);
       const created = await createResponse.json();
-      
+
       // Add a longer delay to ensure data is fully persisted across all systems
       await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -154,7 +149,7 @@ test.describe('API Endpoints', () => {
       expect(allAnnouncementsResponse.status()).toBe(200);
       const allAnnouncements = await allAnnouncementsResponse.json();
       const foundAnnouncement = allAnnouncements.find((a: any) => a.id === created.id);
-      
+
       if (!foundAnnouncement) {
         console.error('Created announcement not found in list:', created.id);
         console.error('Available announcement IDs:', allAnnouncements.map((a: any) => a.id));
@@ -177,7 +172,7 @@ test.describe('API Endpoints', () => {
         console.error('Update failed for ID:', created.id);
         console.error('Update response status:', updateResponse.status());
         console.error('Update response text:', await updateResponse.text());
-        
+
         // Re-check announcements list to see current state
         const recheckResponse = await request.get('/api/announcements');
         const recheckAnnouncements = await recheckResponse.json();
@@ -185,7 +180,7 @@ test.describe('API Endpoints', () => {
       }
 
       expect(updateResponse.status()).toBe(200);
-      
+
       const updated = await updateResponse.json();
       expect(updated.title).toBe('Updated Title');
       expect(updated.content).toBe('Updated content');
@@ -206,7 +201,7 @@ test.describe('API Endpoints', () => {
       const createResponse = await request.post('/api/announcements', {
         data: newAnnouncement
       });
-      
+
       expect(createResponse.status()).toBe(201);
       const created = await createResponse.json();
 
@@ -226,14 +221,14 @@ test.describe('API Endpoints', () => {
       // Verify it's deleted by trying to get all announcements and checking it's not there
       const getResponse = await request.get('/api/announcements');
       const announcements = await getResponse.json();
-      
+
       const deletedAnnouncement = announcements.find((a: any) => a.id === created.id);
       expect(deletedAnnouncement).toBeUndefined();
     });
 
     test('should handle non-existent announcement ID', async ({ request }) => {
       const nonExistentId = 'non-existent-id-12345';
-      
+
       const getResponse = await request.put(`/api/announcements/${nonExistentId}`, {
         data: {
           type: 'tip',
@@ -245,7 +240,7 @@ test.describe('API Endpoints', () => {
           isActive: true
         }
       });
-      
+
       expect(getResponse.status()).toBe(404);
     });
 
