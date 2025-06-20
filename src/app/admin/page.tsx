@@ -65,6 +65,9 @@ export default function AdminPage() {
   
   // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null)
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -148,18 +151,11 @@ export default function AdminPage() {
       
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create announcement')
+        throw new Error(errorData.error ?? 'Failed to create announcement')
       }
       
       // Reset form and close modal
-      setFormData({
-        title: '',
-        content: '',
-        type: 'tip',
-        priority: 'low',
-        date: new Date().toISOString().split('T')[0]
-      })
-      setFormErrors({})
+      resetForm()
       setShowCreateModal(false)
       
       // Refresh announcements list
@@ -170,6 +166,205 @@ export default function AdminPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  // Handle edit announcement
+  const handleEditAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!validateForm() || !selectedAnnouncement) {
+      return
+    }
+    
+    setSubmitting(true)
+    try {
+      const response = await fetch(`/api/announcements/${selectedAnnouncement.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          isActive: selectedAnnouncement.isActive
+        })
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error ?? 'Failed to update announcement')
+      }
+      
+      // Reset form and close modal
+      resetForm()
+      setShowEditModal(false)
+      setSelectedAnnouncement(null)
+      
+      // Refresh announcements list
+      await fetchAnnouncements()
+      
+    } catch (err) {
+      setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // Handle delete announcement
+  const handleDeleteAnnouncement = async () => {
+    if (!selectedAnnouncement) return
+    
+    setSubmitting(true)
+    try {
+      const response = await fetch(`/api/announcements/${selectedAnnouncement.id}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error ?? 'Failed to delete announcement')
+      }
+      
+      // Close modal and refresh list
+      setShowDeleteModal(false)
+      setSelectedAnnouncement(null)
+      await fetchAnnouncements()
+      
+    } catch (err) {
+      setFormErrors({ submit: err instanceof Error ? err.message : 'An error occurred' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // Open edit modal with announcement data
+  const openEditModal = (announcement: any) => {
+    setSelectedAnnouncement(announcement)
+    setFormData({
+      title: announcement.title,
+      content: announcement.content,
+      type: announcement.type,
+      priority: announcement.priority,
+      date: announcement.date
+    })
+    setFormErrors({})
+    setShowEditModal(true)
+  }
+
+  // Open delete modal
+  const openDeleteModal = (announcement: any) => {
+    setSelectedAnnouncement(announcement)
+    setShowDeleteModal(true)
+  }
+
+  // Reset form helper
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      type: 'tip',
+      priority: 'low',
+      date: new Date().toISOString().split('T')[0]
+    })
+    setFormErrors({})
+  }
+
+  // Helper function to render table body content
+  const renderTableBody = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan={6} className="px-6 py-8 text-center">
+            <div className="flex items-center justify-center">
+              <Loader2 className="w-6 h-6 animate-spin mr-2" />
+              <span className="text-gray-500">Loading announcements...</span>
+            </div>
+          </td>
+        </tr>
+      )
+    }
+
+    if (error) {
+      return (
+        <tr>
+          <td colSpan={6} className="px-6 py-8 text-center">
+            <div className="text-red-500">
+              <p>Error loading announcements: {error}</p>
+              <button 
+                onClick={fetchAnnouncements}
+                className="mt-2 text-primary-600 hover:text-primary-700 underline"
+              >
+                Try again
+              </button>
+            </div>
+          </td>
+        </tr>
+      )
+    }
+
+    if (announcements.length === 0) {
+      return (
+        <tr>
+          <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+            No announcements found
+          </td>
+        </tr>
+      )
+    }
+
+    return announcements.map((announcement) => (
+      <tr key={announcement.id} className="hover:bg-gray-50">
+        <td className="px-6 py-4 whitespace-nowrap">
+          <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span data-testid={`type-badge-${announcement.type}`} className={`px-2 py-1 text-xs font-medium rounded-full border ${typeColors[announcement.type as keyof typeof typeColors]}`}>
+            {announcement.type}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span data-testid={`status-badge-${announcement.isActive ? 'published' : 'draft'}`} className={`px-2 py-1 text-xs font-medium rounded-full border ${statusColors[announcement.isActive ? 'published' : 'draft' as keyof typeof statusColors]}`}>
+            {announcement.isActive ? 'published' : 'draft'}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {announcement.author}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          {announcement.date}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <div className="flex items-center space-x-2">
+            <span className="flex items-center">
+              <Eye className="w-4 h-4 mr-1" data-lucide="eye" />
+              {announcement.views ?? 0}
+            </span>
+            <span className="flex items-center">
+              👍 {announcement.reactions ?? 0}
+            </span>
+          </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => openEditModal(announcement)}
+              data-testid="edit-button" 
+              className="text-primary-600 hover:text-primary-700"
+              title="Edit announcement"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => openDeleteModal(announcement)}
+              data-testid="delete-button" 
+              className="text-red-600 hover:text-red-700"
+              title="Delete announcement"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
   }
 
   const renderAnnouncementsTab = () => (
@@ -215,81 +410,7 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <div className="flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                      <span className="text-gray-500">Loading announcements...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <div className="text-red-500">
-                      <p>Error loading announcements: {error}</p>
-                      <button 
-                        onClick={fetchAnnouncements}
-                        className="mt-2 text-primary-600 hover:text-primary-700 underline"
-                      >
-                        Try again
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ) : announcements.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No announcements found
-                  </td>
-                </tr>
-              ) : (
-                announcements.map((announcement) => (
-                <tr key={announcement.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{announcement.title}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span data-testid={`type-badge-${announcement.type}`} className={`px-2 py-1 text-xs font-medium rounded-full border ${typeColors[announcement.type as keyof typeof typeColors]}`}>
-                      {announcement.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span data-testid={`status-badge-${announcement.isActive ? 'published' : 'draft'}`} className={`px-2 py-1 text-xs font-medium rounded-full border ${statusColors[announcement.isActive ? 'published' : 'draft' as keyof typeof statusColors]}`}>
-                      {announcement.isActive ? 'published' : 'draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {announcement.author}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {announcement.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center space-x-2">
-                      <span className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" data-lucide="eye" />
-                        {announcement.views || 0}
-                      </span>
-                      <span className="flex items-center">
-                        👍 {announcement.reactions || 0}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button data-testid="edit-button" className="text-primary-600 hover:text-primary-700">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button data-testid="delete-button" className="text-red-600 hover:text-red-700">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                ))
-              )}
+              {renderTableBody()}
             </tbody>
           </table>
         </div>
@@ -681,14 +802,7 @@ export default function AdminPage() {
                 <button
                   onClick={() => {
                     setShowCreateModal(false)
-                    setFormErrors({})
-                    setFormData({
-                      title: '',
-                      content: '',
-                      type: 'tip',
-                      priority: 'low',
-                      date: new Date().toISOString().split('T')[0]
-                    })
+                    resetForm()
                   }}
                   className="text-gray-400 hover:text-gray-600 transition"
                   data-testid="close-modal-button"
@@ -810,14 +924,7 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => {
                       setShowCreateModal(false)
-                      setFormErrors({})
-                      setFormData({
-                        title: '',
-                        content: '',
-                        type: 'tip',
-                        priority: 'low',
-                        date: new Date().toISOString().split('T')[0]
-                      })
+                      resetForm()
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
                     disabled={submitting}
@@ -842,6 +949,242 @@ export default function AdminPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Announcement Modal */}
+      {showEditModal && selectedAnnouncement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" data-testid="edit-modal">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold">Edit Announcement</h3>
+                <button
+                  onClick={() => {
+                    setShowEditModal(false)
+                    setSelectedAnnouncement(null)
+                    resetForm()
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                  data-testid="close-edit-modal-button"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditAnnouncement} className="space-y-6" data-testid="edit-announcement-form">
+                {formErrors.submit && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+                    {formErrors.submit}
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="edit-title" className="block text-sm font-medium text-gray-700 mb-2">
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-title"
+                    data-testid="edit-title-input"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.title ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter announcement title"
+                    maxLength={100}
+                  />
+                  {formErrors.title && (
+                    <p className="text-red-600 text-sm mt-1">{formErrors.title}</p>
+                  )}
+                  <p className="text-gray-500 text-sm mt-1">{formData.title.length}/100 characters</p>
+                </div>
+
+                <div>
+                  <label htmlFor="edit-content" className="block text-sm font-medium text-gray-700 mb-2">
+                    Content *
+                  </label>
+                  <textarea
+                    id="edit-content"
+                    data-testid="edit-content-input"
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    rows={6}
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.content ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter announcement content"
+                    maxLength={1000}
+                  />
+                  {formErrors.content && (
+                    <p className="text-red-600 text-sm mt-1">{formErrors.content}</p>
+                  )}
+                  <p className="text-gray-500 text-sm mt-1">{formData.content.length}/1000 characters</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="edit-type" className="block text-sm font-medium text-gray-700 mb-2">
+                      Type
+                    </label>
+                    <select
+                      id="edit-type"
+                      data-testid="edit-type-select"
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="tip">Tip</option>
+                      <option value="delivery">Delivery</option>
+                      <option value="order">Order</option>
+                      <option value="event">Event</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="edit-priority" className="block text-sm font-medium text-gray-700 mb-2">
+                      Priority
+                    </label>
+                    <select
+                      id="edit-priority"
+                      data-testid="edit-priority-select"
+                      value={formData.priority}
+                      onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="edit-date" className="block text-sm font-medium text-gray-700 mb-2">
+                    Publish Date *
+                  </label>
+                  <input
+                    type="date"
+                    id="edit-date"
+                    data-testid="edit-date-input"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className={`w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      formErrors.date ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  />
+                  {formErrors.date && (
+                    <p className="text-red-600 text-sm mt-1">{formErrors.date}</p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end space-x-4 pt-4 border-t">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditModal(false)
+                      setSelectedAnnouncement(null)
+                      resetForm()
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                    disabled={submitting}
+                    data-testid="edit-cancel-button"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="edit-submit-button"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Announcement'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedAnnouncement && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" data-testid="delete-modal">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-900">Delete Announcement</h3>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setSelectedAnnouncement(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                  data-testid="close-delete-modal-button"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-600 mb-4">
+                  Are you sure you want to delete this announcement? This action cannot be undone.
+                </p>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-2">{selectedAnnouncement.title}</h4>
+                  <p className="text-sm text-gray-600">
+                    {selectedAnnouncement.content.substring(0, 100)}
+                    {selectedAnnouncement.content.length > 100 ? '...' : ''}
+                  </p>
+                </div>
+              </div>
+
+              {formErrors.submit && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+                  {formErrors.submit}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteModal(false)
+                    setSelectedAnnouncement(null)
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                  disabled={submitting}
+                  data-testid="delete-cancel-button"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAnnouncement}
+                  disabled={submitting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="delete-confirm-button"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Announcement'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

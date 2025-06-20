@@ -12,11 +12,11 @@ test.describe('Admin Dashboard Integration', () => {
     await expect(page.getByText('Summer Seed Order Deadline').first()).toBeVisible();
     
     // Check type badges
-    const deliveryBadge = page.getByTestId('type-badge-delivery');
+    const deliveryBadge = page.getByTestId('type-badge-delivery').first();
     await expect(deliveryBadge).toBeVisible();
     await expect(deliveryBadge).toHaveClass(/bg-orange-100/);
     
-    const orderBadge = page.getByTestId('type-badge-order');
+    const orderBadge = page.getByTestId('type-badge-order').first();
     await expect(orderBadge).toBeVisible();
     await expect(orderBadge).toHaveClass(/bg-blue-100/);
   });

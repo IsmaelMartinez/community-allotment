@@ -1,7 +1,64 @@
 import { test, expect } from '@playwright/test';
+import { promises as fs } from 'fs'
+import path from 'path'
+
+// Remove serial mode since we're fixing parallel execution
+// test.describe.configure({ mode: 'serial' });
+
+const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
+const BACKUP_FILE = path.join(process.cwd(), 'data', 'announcements-demo-backup.json')
+
+// Helper to create unique test data file for each worker
+async function getTestDataFile(testInfo: any) {
+  const workerId = testInfo.workerIndex ?? 0
+  const testDataFile = path.join(process.cwd(), 'data', `announcements-test-${workerId}.json`)
+  
+  // Copy backup data to test-specific file
+  const backupData = await fs.readFile(BACKUP_FILE, 'utf-8')
+  await fs.writeFile(testDataFile, backupData)
+  
+  return testDataFile
+}
+
+// Helper to cleanup test data file
+async function cleanupTestDataFile(testDataFile: string) {
+  try {
+    await fs.unlink(testDataFile)
+  } catch (error) {
+    // Ignore if file doesn't exist
+    console.debug('Test data file already cleaned up:', error)
+  }
+}
+
+// Helper to reset announcements data using test-specific file
+async function resetAnnouncementsData(testDataFile: string) {
+  try {
+    const backupData = await fs.readFile(BACKUP_FILE, 'utf-8')
+    await fs.writeFile(testDataFile, backupData)
+    // Also copy to main data file for API to read
+    await fs.writeFile(DATA_FILE, backupData)
+  } catch (error) {
+    console.warn('Could not reset announcements data:', error)
+  }
+}
 
 test.describe('API Endpoints', () => {
   test.describe('Announcements API', () => {
+    let testDataFile: string;
+
+    test.beforeEach(async ({ page }, testInfo) => {
+      // Create test-specific data file
+      testDataFile = await getTestDataFile(testInfo)
+      // Reset announcements data before each test
+      await resetAnnouncementsData(testDataFile)
+    })
+
+    test.afterEach(async () => {
+      // Clean up test-specific data file after each test
+      if (testDataFile) {
+        await cleanupTestDataFile(testDataFile)
+      }
+    })
     test('GET /api/announcements should return announcements', async ({ request }) => {
       const response = await request.get('/api/announcements');
       

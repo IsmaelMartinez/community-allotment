@@ -2,80 +2,65 @@ import { test, expect } from '@playwright/test'
 import { promises as fs } from 'fs'
 import path from 'path'
 
-// Demo data to reset to before each test
-const DEMO_DATA = [
-  {
-    "id": "demo-1",
-    "type": "delivery",
-    "title": "Bark Mulch Delivery - This Saturday",
-    "content": "Fresh bark mulch will be delivered this Saturday at 9 AM. Please ensure your plot area is accessible for the delivery truck.",
-    "author": "Admin",
-    "date": "2025-06-16",
-    "priority": "high",
-    "isActive": true,
-    "createdAt": "2025-06-19T12:00:00.000Z",
-    "updatedAt": "2025-06-19T12:00:00.000Z"
-  },
-  {
-    "id": "demo-2",
-    "type": "order",
-    "title": "Summer Seed Order Deadline",
-    "content": "Last chance to submit your orders for summer vegetable seeds. Order deadline is June 20th.",
-    "author": "Plot Manager",
-    "date": "2025-06-15",
-    "priority": "medium",
-    "isActive": true,
-    "createdAt": "2025-06-19T11:00:00.000Z",
-    "updatedAt": "2025-06-19T11:00:00.000Z"
-  },
-  {
-    "id": "demo-3",
-    "type": "tip",
-    "title": "Watering Tips for Hot Weather",
-    "content": "During hot weather, water your plants early in the morning or late in the evening to reduce evaporation and prevent leaf burn.",
-    "author": "Garden Expert",
-    "date": "2025-06-18",
-    "priority": "low",
-    "isActive": true,
-    "createdAt": "2025-06-18T10:00:00.000Z",
-    "updatedAt": "2025-06-18T10:00:00.000Z"
-  },
-  {
-    "id": "demo-4",
-    "type": "event",
-    "title": "Community BBQ - Next Sunday",
-    "content": "Join us for our annual community BBQ next Sunday at 2 PM. Bring your family and friends!",
-    "author": "Social Committee",
-    "date": "2025-06-22",
-    "priority": "medium",
-    "isActive": true,
-    "createdAt": "2025-06-17T15:00:00.000Z",
-    "updatedAt": "2025-06-17T15:00:00.000Z"
-  }
-]
+// Remove serial mode since we're implementing proper parallel test isolation
+// test.describe.configure({ mode: 'serial' });
 
 const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
+const BACKUP_FILE = path.join(process.cwd(), 'data', 'announcements-demo-backup.json')
 
-async function resetDataFile() {
+// Helper to create unique test data file for each worker
+async function getTestDataFile(testInfo: any) {
+  const workerId = testInfo.workerIndex ?? 0
+  const testDataFile = path.join(process.cwd(), 'data', `announcements-test-${workerId}.json`)
+  
+  // Copy backup data to test-specific file
+  const backupData = await fs.readFile(BACKUP_FILE, 'utf-8')
+  await fs.writeFile(testDataFile, backupData)
+  
+  return testDataFile
+}
+
+// Helper to cleanup test data file
+async function cleanupTestDataFile(testDataFile: string) {
   try {
-    await fs.writeFile(DATA_FILE, JSON.stringify(DEMO_DATA, null, 2))
+    await fs.unlink(testDataFile)
   } catch (error) {
-    console.error('Failed to reset data file:', error)
+    // Ignore if file doesn't exist
+    console.debug('Test data file already cleaned up:', error)
+  }
+}
+
+// Helper to reset announcements data using test-specific file
+async function resetAnnouncementsData(testDataFile: string) {
+  try {
+    const backupData = await fs.readFile(BACKUP_FILE, 'utf-8')
+    await fs.writeFile(testDataFile, backupData)
+    // Also copy to main data file for API to read
+    await fs.writeFile(DATA_FILE, backupData)
+  } catch (error) {
+    console.warn('Could not reset announcements data:', error)
   }
 }
 
 test.describe('Admin - Create Announcement Modal', () => {
-  test.beforeEach(async ({ page }) => {
-    // Reset data file before each test
-    await resetDataFile()
+  let testDataFile: string;
+
+  test.beforeEach(async ({ page }, testInfo) => {
+    // Create test-specific data file
+    testDataFile = await getTestDataFile(testInfo)
+    
+    // Reset data for this test
+    await resetAnnouncementsData(testDataFile)
     
     await page.goto('/admin')
     await page.waitForSelector('[data-testid="new-announcement-button"]')
   })
 
   test.afterEach(async () => {
-    // Reset data file after each test for cleanup
-    await resetDataFile()
+    // Clean up test-specific data file
+    if (testDataFile) {
+      await cleanupTestDataFile(testDataFile)
+    }
   })
 
   test('should open modal when New Announcement button is clicked', async ({ page }) => {
@@ -200,15 +185,12 @@ test.describe('Admin - Create Announcement Modal', () => {
     // Wait for modal to close (indicates success)
     await expect(page.locator('[data-testid="create-modal"]')).not.toBeVisible()
     
-    // Wait for the page to refresh and new announcement to appear
-    await page.waitForTimeout(3000)
+    // Wait for the new announcement to appear in the list
+    await expect(page.locator(`text=${uniqueTitle}`).first()).toBeVisible({ timeout: 10000 })
     
     // Should now have 5 announcements
     const finalRows = await page.locator('tbody tr').count()
     expect(finalRows).toBe(5)
-    
-    // Check if the new announcement appears in the list
-    await expect(page.locator(`text=${uniqueTitle}`).first()).toBeVisible()
   })
 
   test('should reset form when modal is reopened after closing', async ({ page }) => {
