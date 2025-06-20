@@ -38,12 +38,12 @@
   {
     "id": "demo-4",
     "type": "event",
-    "title": "Community BBQ - Next Sunday",
-    "content": "Join us for our annual community BBQ next Sunday at 2 PM. Bring your family and friends!",
-    "author": "Social Committee",
-    "date": "2025-06-22",
+    "title": "Water Conservation Workshop",
+    "content": "Join us for a workshop on water conservation techniques for your allotment. Saturday 10 AM at the community shed.",
+    "author": "Admin",
+    "date": "2025-06-18",
     "priority": "medium",
-    "isActive": true,
+    "isActive": false,
     "createdAt": "2025-06-17T15:00:00.000Z",
     "updatedAt": "2025-06-17T15:00:00.000Z"
   }
