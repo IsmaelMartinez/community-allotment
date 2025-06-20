@@ -210,6 +210,12 @@ test.describe('API Endpoints', () => {
       expect(createResponse.status()).toBe(201);
       const created = await createResponse.json();
 
+      // Verify the announcement exists before deleting it
+      const verifyResponse = await request.get('/api/admin/announcements');
+      const allAnnouncements = await verifyResponse.json();
+      const foundAnnouncement = allAnnouncements.find((a: any) => a.id === created.id);
+      expect(foundAnnouncement).toBeDefined();
+
       // Then, delete it
       const deleteResponse = await request.delete(`/api/announcements/${created.id}`);
       expect(deleteResponse.status()).toBe(200);
