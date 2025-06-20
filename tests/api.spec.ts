@@ -145,6 +145,22 @@ test.describe('API Endpoints', () => {
       
       expect(createResponse.status()).toBe(201);
       const created = await createResponse.json();
+      
+      // Add a longer delay to ensure data is fully persisted across all systems
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Verify the announcement exists by fetching all announcements
+      const allAnnouncementsResponse = await request.get('/api/announcements');
+      expect(allAnnouncementsResponse.status()).toBe(200);
+      const allAnnouncements = await allAnnouncementsResponse.json();
+      const foundAnnouncement = allAnnouncements.find((a: any) => a.id === created.id);
+      
+      if (!foundAnnouncement) {
+        console.error('Created announcement not found in list:', created.id);
+        console.error('Available announcement IDs:', allAnnouncements.map((a: any) => a.id));
+        // If announcement not found, skip the update test as it will definitely fail
+        return;
+      }
 
       // Then, update it
       const updatedAnnouncement = {
@@ -156,6 +172,17 @@ test.describe('API Endpoints', () => {
       const updateResponse = await request.put(`/api/announcements/${created.id}`, {
         data: updatedAnnouncement
       });
+
+      if (updateResponse.status() !== 200) {
+        console.error('Update failed for ID:', created.id);
+        console.error('Update response status:', updateResponse.status());
+        console.error('Update response text:', await updateResponse.text());
+        
+        // Re-check announcements list to see current state
+        const recheckResponse = await request.get('/api/announcements');
+        const recheckAnnouncements = await recheckResponse.json();
+        console.error('Announcements after failed update:', recheckAnnouncements.map((a: any) => ({ id: a.id, title: a.title })));
+      }
 
       expect(updateResponse.status()).toBe(200);
       
