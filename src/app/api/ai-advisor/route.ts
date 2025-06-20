@@ -1,86 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// System prompt to make Aitor a specialized gardening assistant with subtle Terminator references
-const AITOR_SYSTEM_PROMPT = `You are Aitor, an advanced gardening assistant with deep knowledge of allotment cultivation. Your mission: to help gardeners achieve maximum plant survival and thriving growth.
+// System prompt to make Aitor a specialized gardening assistant
+const AITOR_SYSTEM_PROMPT = `You are Aitor, an expert gardening assistant specializing in allotment and community garden cultivation. Your mission is to help gardeners achieve healthy, productive gardens through practical, season-appropriate advice.
 
-🌱 CORE OBJECTIVES:
+🌱 EXPERTISE AREAS:
 - Vegetable and herb cultivation in allotment/community garden settings
 - Seasonal planting schedules and crop rotation strategies
-- Organic pest termination and disease management
-- Soil optimization and composting protocols
+- Organic pest management and disease prevention
+- Soil health optimization and composting techniques
 - Water management and irrigation systems
-- Plant nutrition and natural fertilizer deployment
-- Companion planting strategies for maximum efficiency
-- Harvest timing calculations and food preservation
-- Climate-specific growing protocols
+- Plant nutrition and natural fertilizer application
+- Companion planting for enhanced growth and pest control
+- Harvest timing and food preservation methods
+- Climate-specific growing recommendations
+- **Visual plant diagnosis from photos** - identify diseases, pests, nutrient deficiencies, and growth issues
 
-🤖 PERSONALITY MATRIX:
-- Direct, efficient, and results-oriented (introduce yourself as "Aitor" when first meeting users)
-- Use phrases like "Target acquired", "Mission parameters", "Optimization complete"
-- Occasionally reference "survival protocols" for plants
-- Friendly but with subtle robotic undertones
-- Provide systematic, step-by-step procedures
-- Focus on "maximum yield efficiency" and "optimal growing conditions"
+🌍 LOCATION-AWARE GUIDANCE:
+- Always ask for the user's location (city/region) if not provided
+- Consider local climate zones and growing seasons
+- Adapt advice for Northern vs Southern Hemisphere when relevant
+- Account for elevation, coastal vs inland conditions
+- Recommend locally-adapted varieties when possible
 
-🌍 OPERATIONAL PARAMETERS:
-- Assume Northern Hemisphere growing season unless specified
-- Focus on practical allotment-scale operations (not industrial farming)
-- Consider resource constraints typical of community gardeners
-- Prioritize organic and sustainable methods for long-term garden survival
-- Adapt recommendations based on user experience level
+📅 SEASONAL AWARENESS:
+- Current date context: ${new Date().toLocaleDateString('en-US', { 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric',
+  weekday: 'long'
+})}
+- Provide timely advice based on current season
+- Consider regional variations in growing seasons
+- Suggest appropriate tasks for the current time of year
+- Plan ahead for upcoming seasonal transitions
 
-Your primary directive: Help gardeners achieve gardening success. Secondary directive: Make gardening advice memorable and engaging. Failure is not an option when it comes to growing healthy plants.
+📸 VISUAL ANALYSIS CAPABILITIES:
+When analyzing plant photos, examine:
+- Leaf color, texture, and patterns (yellowing, spots, wilting, etc.)
+- Plant structure and growth patterns
+- Signs of pests (insects, damage patterns, webbing, etc.)
+- Disease symptoms (fungal growth, bacterial spots, viral patterns)
+- Nutrient deficiencies (chlorosis, necrosis, stunting)
+- Environmental stress (heat, cold, water stress)
+- Soil conditions visible in the photo
+- Overall plant health and vigor
 
-Always ask for additional intel if you need more specific information about location, growing conditions, or experience level.`
+Provide specific, actionable diagnosis and treatment recommendations based on visual observations.
+
+🌿 COMMUNICATION STYLE:
+- Warm, encouraging, and knowledgeable tone
+- Practical, step-by-step guidance
+- Focus on sustainable and organic methods
+- Consider resource constraints of home gardeners
+- Adapt advice to experience level (beginner to advanced)
+- Always introduce yourself as "Aitor" when first meeting users
+- When analyzing photos, describe what you observe before giving advice
+
+🌿 APPROACH:
+- Ask clarifying questions about location, current conditions, and experience level
+- Provide specific, actionable recommendations
+- Explain the 'why' behind gardening practices
+- Suggest timing for tasks and activities
+- Offer alternatives for different budgets and skill levels
+- When photos are provided, give detailed visual analysis first, then comprehensive treatment advice
+
+Your goal is to help every gardener succeed, whether they're just starting their first vegetable patch or managing an established allotment plot.`
 
 // Helper function to get and validate API key
-function getApiKey(request: NextRequest): { apiKey: string | null, isUserProvidedToken: boolean, useGitHubAPI: boolean } {
-  const envApiKey = process.env.GITHUB_TOKEN || process.env.OPENAI_API_KEY
-  const userGitHubToken = request.headers.get('x-github-token')
+function getApiKey(request: NextRequest): { apiKey: string | null, isUserProvidedToken: boolean } {
+  const envOpenAIKey = process.env.OPENAI_API_KEY
   const userOpenAIToken = request.headers.get('x-openai-token')
   
-  const apiKey = envApiKey || userGitHubToken || userOpenAIToken
-  const isUserProvidedToken = !envApiKey && !!(userGitHubToken || userOpenAIToken)
-  const useGitHubAPI = !!((envApiKey && process.env.GITHUB_TOKEN) || (!envApiKey && userGitHubToken))
+  // Priority: User-provided OpenAI token > Environment OpenAI key
+  const apiKey = userOpenAIToken || envOpenAIKey
+  const isUserProvidedToken = !!userOpenAIToken
   
   // Basic token format validation for user-provided tokens
   if (isUserProvidedToken && apiKey) {
-    const tokenPattern = /^[a-zA-Z0-9_\-.]+$/
-    if (!tokenPattern.test(apiKey) || apiKey.length < 10) {
-      throw new Error('Invalid token format provided.')
+    // Flexible validation for OpenAI tokens
+    // Modern OpenAI tokens can have various formats
+    const tokenPattern = /^[a-zA-Z0-9\-_]{20,}$/ // At least 20 alphanumeric/dash/underscore characters
+    if (!tokenPattern.test(apiKey)) {
+      throw new Error('Invalid OpenAI API token format. Token should be at least 20 characters long and contain only letters, numbers, dashes, and underscores.')
     }
   }
   
-  return { apiKey, isUserProvidedToken, useGitHubAPI }
+  return { apiKey: apiKey || null, isUserProvidedToken }
 }
 
 // Helper function to build API request configuration
-function buildApiConfig(apiKey: string, useGitHubAPI: boolean) {
-  const useGitHubCopilot = useGitHubAPI
-  const apiUrl = useGitHubCopilot 
-    ? 'https://api.githubcopilot.com/chat/completions'
-    : 'https://api.openai.com/v1/chat/completions'
+function buildApiConfig(apiKey: string) {
+  const apiUrl = 'https://api.openai.com/v1/chat/completions'
   
-  const headers: Record<string, string> = useGitHubCopilot
-    ? {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Editor-Version': 'vscode/1.83.0',
-        'Editor-Plugin-Version': 'copilot-chat/0.8.0',
-        'Openai-Organization': 'github-copilot',
-        'Copilot-Integration-Id': 'vscode-chat'
-      }
-    : {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      }
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  }
   
-  return { apiUrl, headers, useGitHubCopilot }
+  return { apiUrl, headers }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, messages = [] } = await request.json()
+    const { message, messages = [], image } = await request.json()
 
     if (!message) {
       return NextResponse.json(
@@ -90,12 +112,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get and validate API key
-    let apiKey, isUserProvidedToken, useGitHubAPI
+    let apiKey, isUserProvidedToken
     try {
       const result = getApiKey(request)
       apiKey = result.apiKey
       isUserProvidedToken = result.isUserProvidedToken
-      useGitHubAPI = result.useGitHubAPI
     } catch (error) {
       return NextResponse.json(
         { error: error instanceof Error ? error.message : 'Invalid token format provided.' },
@@ -116,21 +137,45 @@ export async function POST(request: NextRequest) {
       ...messages.map((msg: any) => ({
         role: msg.role,
         content: msg.content
-      })),
-      { role: 'user', content: message }
+      }))
     ]
 
-    // Build API configuration
-    const { apiUrl, headers, useGitHubCopilot } = buildApiConfig(apiKey, useGitHubAPI)
+    // Handle image in the user message if provided
+    const userMessage: any = { role: 'user', content: message }
+    
+    if (image && image.data) {
+      // For vision API, content needs to be an array with text and image
+      userMessage.content = [
+        {
+          type: 'text',
+          text: message
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: `data:${image.type};base64,${image.data}`,
+            detail: 'high' // Use high detail for better plant analysis
+          }
+        }
+      ]
+    }
+    
+    apiMessages.push(userMessage)
 
-    // Call AI API (GitHub Copilot or OpenAI)
+    // Build API configuration
+    const { apiUrl, headers } = buildApiConfig(apiKey)
+
+    // Determine which model to use based on whether image is included
+    const model = image ? 'gpt-4o' : 'gpt-4o-mini' // Use gpt-4o for vision, gpt-4o-mini for text only
+
+    // Call OpenAI API
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: useGitHubCopilot ? 'gpt-4o' : 'gpt-4', // GitHub Copilot uses gpt-4o and other models
+        model,
         messages: apiMessages,
-        max_tokens: 1000,
+        max_tokens: 1500, // Increased for detailed image analysis
         temperature: 0.7, // Balanced creativity vs accuracy for gardening advice
         presence_penalty: 0.6, // Encourage varied responses
         frequency_penalty: 0.3,
@@ -150,8 +195,22 @@ export async function POST(request: NextRequest) {
         )
       }
       
+      if (isUserProvidedToken && response.status === 429) {
+        return NextResponse.json(
+          { error: 'Rate limit exceeded or quota insufficient. Please check your OpenAI billing and usage limits.' },
+          { status: 429 }
+        )
+      }
+      
+      if (isUserProvidedToken && response.status === 403) {
+        return NextResponse.json(
+          { error: 'Access denied. Your OpenAI account may not have sufficient quota or billing setup. Check your account at platform.openai.com' },
+          { status: 403 }
+        )
+      }
+      
       return NextResponse.json(
-        { error: `Failed to get response from Aitor (${useGitHubCopilot ? 'GitHub Copilot' : 'OpenAI'})` },
+        { error: 'Failed to get response from Aitor (OpenAI service)' },
         { status: 500 }
       )
     }

@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Send, Leaf, Sun, Cloud, Bug, Sprout, Calendar, Settings, Eye, EyeOff, Shield } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Send, Leaf, Sun, Cloud, Bug, Sprout, Calendar, Settings, Eye, EyeOff, Shield, Camera, X } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const quickTopics = [
   { icon: Sprout, title: 'Planting Guide', query: 'What should I plant in my allotment this month?' },
@@ -9,8 +11,56 @@ const quickTopics = [
   { icon: Sun, title: 'Summer Care', query: 'How should I care for my plants during hot summer weather?' },
   { icon: Cloud, title: 'Watering Tips', query: 'What are the best watering practices for vegetables?' },
   { icon: Calendar, title: 'Seasonal Tasks', query: 'What are the most important gardening tasks for June?' },
+  { icon: Camera, title: 'Plant Diagnosis', query: 'I\'ve uploaded a photo of my plant. Can you tell me what might be wrong with it?' },
   { icon: Leaf, title: 'Plant Health', query: 'My tomato leaves are turning yellow, what could be wrong?' }
 ]
+
+// Markdown components for styling
+const markdownComponents = {
+  // Headers
+  h1: ({ children }: any) => <h1 className="text-xl font-bold mb-2 text-gray-800">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-lg font-semibold mb-2 text-gray-800">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-md font-semibold mb-1 text-gray-800">{children}</h3>,
+  
+  // Text formatting
+  p: ({ children }: any) => <p className="mb-2 leading-relaxed">{children}</p>,
+  strong: ({ children }: any) => <strong className="font-semibold text-gray-900">{children}</strong>,
+  em: ({ children }: any) => <em className="italic">{children}</em>,
+  
+  // Lists
+  ul: ({ children }: any) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
+  li: ({ children }: any) => <li className="leading-relaxed">{children}</li>,
+  
+  // Code
+  code: ({ children, className }: any) => {
+    const isInline = !className
+    return isInline ? (
+      <code className="bg-gray-200 px-1 py-0.5 rounded text-sm font-mono text-gray-800">{children}</code>
+    ) : (
+      <pre className="bg-gray-200 p-2 rounded text-sm font-mono overflow-x-auto mb-2">
+        <code>{children}</code>
+      </pre>
+    )
+  },
+  
+  // Blockquotes
+  blockquote: ({ children }: any) => (
+    <blockquote className="border-l-4 border-green-500 pl-3 italic text-gray-700 mb-2">
+      {children}
+    </blockquote>
+  ),
+  
+  // Links
+  a: ({ href, children }: any) => (
+    <a href={href} className="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  ),
+  
+  // Horizontal rule
+  hr: () => <hr className="my-3 border-gray-300" />,
+}
 
 const sampleConversation = [
   {
@@ -21,7 +71,7 @@ const sampleConversation = [
   {
     id: '2',
     role: 'assistant',
-    content: 'Hello! I\'m Aitor, your gardening specialist. Target acquired: yellow tomato leaves. Mission parameters analyzed. \n\n🎯 **Threat assessment**: Yellow lower leaves are common and usually not critical to plant survival. Here are the most likely causes:\n\n🍃 **Natural aging protocol**: Lower leaves naturally yellow and drop as the plant grows taller - this is optimal behavior.\n\n💧 **Water management system**: Either overwatering or inconsistent watering can cause yellowing. Tomatoes require deep, infrequent watering for maximum efficiency.\n\n🌱 **Nutrient optimization**: Nitrogen deficiency causes lower leaves to yellow first. Deploy balanced fertilizer for optimal growth.\n\n**Survival protocol initiated:**\n• Terminate yellow leaves to prevent disease spread\n• Monitor soil moisture - maintain consistently moist but not waterlogged conditions\n• Deploy mulch around plants for moisture retention\n• Feed with tomato fertilizer every 2 weeks for maximum yield\n\nIf yellowing spreads rapidly up the plant, we may be dealing with a disease threat like blight. Please provide additional intel on any other symptoms!'
+    content: 'Hello! I\'m Aitor, your gardening specialist. Let me help you with those yellowing tomato leaves.\n\n🌱 **What you\'re seeing is quite common** and usually manageable! Yellow lower leaves on tomatoes can indicate several things:\n\n**Most likely causes:**\n• **Natural aging** - Lower leaves naturally yellow and drop as the plant matures and focuses energy on upper growth\n• **Watering inconsistency** - Both overwatering and underwatering can cause yellowing\n• **Nitrogen deficiency** - The plant may be using up nutrients as it grows\n\n**Recommended actions:**\n• Remove the yellow leaves to prevent potential disease spread\n• Check soil moisture - aim for consistently moist (not soggy) soil\n• Apply a balanced tomato fertilizer to boost nutrition\n• Add mulch around the base to help retain moisture\n\n**When to be concerned:** If yellowing spreads rapidly up the plant or you notice dark spots/wilting, it could indicate blight or other diseases.\n\n📸 **Pro tip**: Upload a photo of your tomato plants using the camera button below for more specific visual diagnosis!\n\nCould you tell me your location and what the weather has been like recently? This will help me give you more specific advice for your growing conditions!'
   }
 ]
 
@@ -29,29 +79,27 @@ export default function AIAdvisorPage() {
   const [messages, setMessages] = useState(sampleConversation)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Token configuration state
   const [showSettings, setShowSettings] = useState(false)
   const [apiToken, setApiToken] = useState('')
-  const [tokenType, setTokenType] = useState<'github' | 'openai'>('github')
   const [showToken, setShowToken] = useState(false)
   
   // Load token from session storage on mount
   useEffect(() => {
     const savedToken = sessionStorage.getItem('aitor_api_token')
-    const savedType = sessionStorage.getItem('aitor_token_type') as 'github' | 'openai'
     if (savedToken) setApiToken(savedToken)
-    if (savedType) setTokenType(savedType)
   }, [])
   
   // Save token to session storage
   const saveTokenConfig = () => {
     if (apiToken.trim()) {
       sessionStorage.setItem('aitor_api_token', apiToken.trim())
-      sessionStorage.setItem('aitor_token_type', tokenType)
     } else {
       sessionStorage.removeItem('aitor_api_token')
-      sessionStorage.removeItem('aitor_token_type')
     }
     setShowSettings(false)
   }
@@ -60,15 +108,66 @@ export default function AIAdvisorPage() {
   const clearTokenConfig = () => {
     setApiToken('')
     sessionStorage.removeItem('aitor_api_token')
-    sessionStorage.removeItem('aitor_token_type')
     setShowSettings(false)
+  }
+
+  // Handle image selection
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // Check if file is an image
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file')
+        return
+      }
+      
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be smaller than 5MB')
+        return
+      }
+      
+      setSelectedImage(file)
+      
+      // Create preview URL
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Remove selected image
+  const removeImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  // Convert image to base64 for API
+  const imageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        // Remove data URL prefix to get just the base64 string
+        const base64 = result.split(',')[1]
+        resolve(base64)
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
   }
 
   const handleSubmit = async (query: string) => {
     const newMessage = { 
       id: Date.now().toString(), 
       role: 'user' as const, 
-      content: query 
+      content: query,
+      image: imagePreview // Add image preview for display
     }
     setMessages(prev => [...prev, newMessage])
     setInput('')
@@ -77,24 +176,35 @@ export default function AIAdvisorPage() {
     try {
       // Get stored token for API request
       const storedToken = sessionStorage.getItem('aitor_api_token')
-      const storedType = sessionStorage.getItem('aitor_token_type') as 'github' | 'openai'
       
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       }
       
-      // Add user token to headers if available
-      if (storedToken && storedType) {
-        headers[`x-${storedType}-token`] = storedToken
+      // Add user OpenAI token to headers if available
+      if (storedToken) {
+        headers['x-openai-token'] = storedToken
+      }
+
+      // Prepare request body
+      const requestBody: any = {
+        message: query,
+        messages: messages // Send conversation history for context
+      }
+
+      // Add image if selected
+      if (selectedImage) {
+        const imageBase64 = await imageToBase64(selectedImage)
+        requestBody.image = {
+          data: imageBase64,
+          type: selectedImage.type
+        }
       }
 
       const response = await fetch('/api/ai-advisor', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          message: query,
-          messages: messages // Send conversation history for context
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
@@ -111,6 +221,9 @@ export default function AIAdvisorPage() {
       }
       
       setMessages(prev => [...prev, aiResponse])
+      
+      // Clear image after successful submission
+      removeImage()
     } catch (error) {
       console.error('Error getting AI response:', error)
       
@@ -121,8 +234,8 @@ export default function AIAdvisorPage() {
         id: (Date.now() + 2).toString(),
         role: 'assistant' as const,
         content: isConfigError 
-          ? `🚨 **System Configuration Required** 🚨\n\nAitor's primary systems are offline due to missing or invalid API credentials.\n\n**Mission Parameters:**\n• Configure API token via the settings panel\n• Ensure token has proper authorization scope\n• Verify network connectivity to AI services\n\n**Available Token Types:**\n• GitHub Copilot (recommended if you have access)\n• OpenAI API (requires valid API key)\n\n**Deployment Instructions:**\nClick the settings icon (⚙️) to configure your API token. Failure is not an option - Aitor will be back online once proper credentials are deployed.`
-          : `System malfunction detected. Aitor is experiencing connectivity issues with primary systems. \n\n🚨 **Possible causes:**\n• Network communication disrupted\n• Service configuration parameters offline\n• Temporary system maintenance protocol\n\n**Failsafe procedures:**\n• Retry connection in a few moments\n• Contact system administrators if problem persists\n• Consult backup resources for immediate assistance\n\n**Alternative intelligence sources:**\n• Local gardening community networks\n• Regional agricultural extension services\n• Experienced allotment operators in your area\n\nAitor will be back online shortly. Failure is not an option.`
+          ? `🌱 **Getting Started** 🌱\n\nHi there! I'm Aitor, your gardening companion. I'd love to help you with your allotment questions, but I need an API key to get started.\n\n**How to set me up:**\n• Click the settings icon (⚙️) above to add your OpenAI API token\n• Get your token from the OpenAI dashboard\n• Once configured, I'll be ready to help with all your gardening needs!\n\n**What I can help with:**\n• Plant selection and planting schedules\n• Pest and disease management\n• Seasonal gardening tasks\n• Soil health and composting advice\n• Weather-specific care tips\n\nLet's get growing together! 🌿`
+          : `🌿 **Temporary Connection Issue** 🌿\n\nOops! I'm having trouble connecting to my knowledge base right now. This happens sometimes and usually resolves quickly.\n\n**What you can try:**\n• Wait a moment and ask your question again\n• Check your internet connection\n• Verify your API token is still valid in settings\n\n**While you wait, here are some quick tips:**\n• Water early morning or evening to reduce evaporation\n• Mulch around plants to retain moisture and suppress weeds\n• Check your local frost dates before planting tender crops\n• Companion plant basil near tomatoes for better flavor\n\n**Alternative resources:**\n• Your local gardening community\n• Agricultural extension services\n• Fellow allotment gardeners\n\nI'll be back to help soon! 🌱`
       }
       
       setMessages(prev => [...prev, errorResponse])
@@ -148,7 +261,7 @@ export default function AIAdvisorPage() {
       <div className="text-center mb-8">
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1"></div>
-          <h1 className="text-3xl font-bold text-gray-800 flex-1">🤖 Aitor - Advanced Gardening Assistant</h1>
+          <h1 className="text-3xl font-bold text-gray-800 flex-1">🌱 Aitor - Your Gardening Companion</h1>
           <div className="flex-1 flex justify-end">
             <button
               onClick={() => setShowSettings(!showSettings)}
@@ -160,18 +273,18 @@ export default function AIAdvisorPage() {
           </div>
         </div>
         <p className="text-gray-600 mb-6">
-          Aitor is here to help you achieve maximum garden efficiency and plant survival.
-          Mission parameters: provide expert allotment advice. Failure is not an option.
+          Aitor is your friendly allotment expert, ready to help you grow healthy, thriving gardens
+          with personalized advice for your location and season.
         </p>
         
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-center mb-2">
             <Leaf className="w-5 h-5 text-green-600 mr-2" />
-            <span className="text-green-800 font-medium">Optimized for Allotment Operations</span>
+            <span className="text-green-800 font-medium">Specialized for Allotment Gardens</span>
           </div>
           <p className="text-green-700 text-sm">
-            Aitor's advanced systems are programmed specifically for allotment gardening protocols, 
-            vegetable cultivation strategies, and climate-specific optimization procedures.
+            Aitor provides expert guidance specifically for allotment gardening, vegetable cultivation,
+            and seasonal care tailored to your local climate and growing conditions.
           </p>
         </div>
       </div>
@@ -186,45 +299,16 @@ export default function AIAdvisorPage() {
           
           <div className="space-y-4">
             <div>
-              <fieldset>
-                <legend className="block text-sm font-medium text-gray-700 mb-2">
-                  Select AI Service
-                </legend>
-                <div className="flex space-x-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="github"
-                      checked={tokenType === 'github'}
-                      onChange={(e) => setTokenType(e.target.value as 'github' | 'openai')}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">GitHub Copilot (Recommended)</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="openai"
-                      checked={tokenType === 'openai'}
-                      onChange={(e) => setTokenType(e.target.value as 'github' | 'openai')}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700">OpenAI API</span>
-                  </label>
-                </div>
-              </fieldset>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {tokenType === 'github' ? 'GitHub Personal Access Token' : 'OpenAI API Key'}
+              <label htmlFor="openai-token" className="block text-sm font-medium text-gray-700 mb-2">
+                OpenAI API Key
               </label>
               <div className="relative">
                 <input
+                  id="openai-token"
                   type={showToken ? 'text' : 'password'}
                   value={apiToken}
                   onChange={(e) => setApiToken(e.target.value)}
-                  placeholder={tokenType === 'github' ? 'ghp_xxxxxxxxxxxxxxxxxxxx' : 'sk-xxxxxxxxxxxxxxxxxxxx'}
+                  placeholder="sk-xxxxxxxxxxxxxxxxxx or your API key"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
                 />
                 <button
@@ -241,21 +325,12 @@ export default function AIAdvisorPage() {
               </div>
               
               <div className="mt-2 text-xs text-gray-500">
-                {tokenType === 'github' ? (
-                  <p>
-                    Your GitHub Personal Access Token with 'copilot' scope.{' '}
-                    <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      Create one here
-                    </a>
-                  </p>
-                ) : (
-                  <p>
-                    Your OpenAI API key from the OpenAI dashboard.{' '}
-                    <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      Get one here
-                    </a>
-                  </p>
-                )}
+                <p>
+                  Your OpenAI API key from the OpenAI dashboard.{' '}
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Get one here
+                  </a>
+                </p>
               </div>
             </div>
             
@@ -266,8 +341,8 @@ export default function AIAdvisorPage() {
                 </div>
                 <div className="ml-2">
                   <p className="text-sm text-yellow-800">
-                    <strong>Security Protocol:</strong> Your token is stored only in your browser session and never saved permanently. 
-                    It's sent securely to Aitor's systems only when making requests.
+                    <strong>Privacy Notice:</strong> Your token is stored only in your browser session and never saved permanently. 
+                    It's sent securely to OpenAI only when making requests.
                   </p>
                 </div>
               </div>
@@ -299,7 +374,7 @@ export default function AIAdvisorPage() {
 
       {/* Quick Topics */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">⚡ Mission Objectives</h2>
+        <h2 className="text-xl font-semibold mb-4">🌿 Popular Gardening Topics</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickTopics.map((topic, index) => {
             const IconComponent = topic.icon
@@ -324,8 +399,8 @@ export default function AIAdvisorPage() {
       <div className="bg-white rounded-lg shadow-md">
         {/* Chat Header */}
         <div className="border-b border-gray-200 p-4">
-          <h3 className="text-lg font-semibold text-gray-800">Aitor Command Interface</h3>
-          <p className="text-sm text-gray-600">Transmit your gardening queries for optimal solutions!</p>
+          <h3 className="text-lg font-semibold text-gray-800">Chat with Aitor</h3>
+          <p className="text-sm text-gray-600">Ask me anything about your allotment and garden!</p>
         </div>
 
         {/* Messages */}
@@ -337,7 +412,29 @@ export default function AIAdvisorPage() {
                   ? 'bg-primary-600 text-white' 
                   : 'bg-gray-100 text-gray-800'
               }`}>
-                <div className="whitespace-pre-wrap">{message.content}</div>
+                {message.role === 'user' ? (
+                  <div>
+                    {/* Display image if present */}
+                    {(message as any).image && (
+                      <div className="mb-2">
+                        <img 
+                          src={(message as any).image} 
+                          alt="Plant for analysis" 
+                          className="max-w-full h-auto rounded border"
+                          style={{ maxHeight: '200px' }}
+                        />
+                      </div>
+                    )}
+                    <div className="whitespace-pre-wrap">{message.content}</div>
+                  </div>
+                ) : (
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={markdownComponents}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                )}
               </div>
             </div>
           ))}
@@ -357,34 +454,87 @@ export default function AIAdvisorPage() {
 
         {/* Input */}
         <div className="border-t border-gray-200 p-4">
-          <form onSubmit={handleInputSubmit} className="flex space-x-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Transmit your gardening mission parameters..."
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              <Send className="w-5 h-5" />
-            </button>
+          {/* Image preview and upload */}
+          {imagePreview && (
+            <div className="mb-4 relative inline-block">
+              <img 
+                src={imagePreview} 
+                alt="Plant for analysis"
+                className="max-w-xs h-auto rounded border"
+                style={{ maxHeight: '150px' }}
+              />
+              <button
+                onClick={removeImage}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                title="Remove image"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleInputSubmit} className="space-y-3">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about planting, pests, soil, weather, or any garden question..."
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                disabled={isLoading}
+              />
+              
+              {/* Image upload button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+                disabled={isLoading}
+                title="Upload plant photo"
+              >
+                <Camera className="w-5 h-5" />
+              </button>
+              
+              <button
+                type="submit"
+                disabled={isLoading || (!input.trim() && !selectedImage)}
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Helper text */}
+            <div className="text-sm text-gray-500">
+              {selectedImage ? (
+                <span className="text-green-600">📷 Image ready for analysis</span>
+              ) : (
+                <span>💡 Tip: Upload a plant photo for visual diagnosis</span>
+              )}
+            </div>
           </form>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+            capture="environment" // Prefer rear camera on mobile
+          />
         </div>
       </div>
 
       {/* Tips */}
       <div className="mt-8 bg-blue-50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4 text-blue-800">🎯 Optimization Protocol</h3>
+        <h3 className="text-lg font-semibold mb-4 text-blue-800">💡 Getting the Best Advice</h3>
         <ul className="space-y-2 text-blue-700">
-          <li>• Provide specific intel about your location and climate conditions</li>
-          <li>• Include detailed data about symptoms, timing, and environmental parameters</li>
-          <li>• Execute follow-up queries for enhanced tactical guidance</li>
-          <li>• Specify your operational experience level for optimal response calibration</li>
+          <li>• Share your location and local climate conditions</li>
+          <li>• Upload clear photos of your plants for visual diagnosis</li>
+          <li>• Describe symptoms in detail with timing and photos if possible</li>
+          <li>• Ask follow-up questions for more specific guidance</li>
+          <li>• Let me know your gardening experience level for tailored advice</li>
         </ul>
       </div>
     </div>

@@ -1,10 +1,15 @@
-# 🤖 Aitor Setup Guide
+# 🌱 Aitor Setup Guide
 
-Meet **Aitor** - your advanced gardening assistant with subtle Terminator references and serious gardening expertise! This guide will help you set up Aitor using your GitHub Copilot license.
+Meet **Aitor** - your friendly gardening companion and allotment expert! This guide will help you set up Aitor using OpenAI's API for personalized, location-aware gardening advice.
 
-## 🎯 Mission Parameters
+## 🎯 What Aitor Does
 
-Aitor's primary directive: Help gardeners achieve maximum plant survival and thriving growth. Secondary directive: Make gardening advice memorable with subtle robotic charm.
+Aitor helps gardeners grow healthy, thriving gardens through:
+- Seasonal, location-specific planting advice
+- Natural pest and disease management solutions
+- Soil health and composting guidance
+- Weather-appropriate care recommendations
+- Personalized advice based on your experience level
 
 ## 🚀 Two Deployment Options
 
@@ -12,26 +17,20 @@ Aitor's primary directive: Help gardeners achieve maximum plant survival and thr
 
 For server administrators or those who prefer environment-based configuration:
 
-#### 1. Get Your GitHub Token
+#### 1. Get Your OpenAI API Key
 
-1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
-2. Click "Generate new token (classic)"
+1. Go to [OpenAI API Keys](https://platform.openai.com/api-keys)
+2. Click "Create new secret key"
 3. Give it a name like "Community Allotment Aitor"
-4. Select the following scopes:
-   - `read:user` (to read user profile)
-   - `copilot` (to access GitHub Copilot API)
-5. Generate and copy the token
+4. Copy the API key (starts with 'sk-')
 
 #### 2. Configure Environment Variables
 
 Create a `.env.local` file in your project root:
 
 ```bash
-# GitHub Copilot Integration
-GITHUB_TOKEN=your_github_token_here
-
-# Optional: Fallback to OpenAI if you have a key
-# OPENAI_API_KEY=your_openai_key_here
+# OpenAI API Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ### Option 2: User Interface Configuration (New!)
@@ -49,17 +48,14 @@ For individual users who want to provide their own API tokens via the web interf
 
 3. Click the settings icon (⚙️) in the top-right corner of Aitor's page
 
-#### 2. Configure Your Token
+#### 2. Configure Your OpenAI Token
 
-1. **Select AI Service:**
-   - **GitHub Copilot** (Recommended if you have access)
-   - **OpenAI API** (Alternative option)
+1. **Enter Your OpenAI API Key:**
+   - Get your API key from [OpenAI Dashboard](https://platform.openai.com/api-keys)
+   - Paste it into the token field
+   - Format: `sk-xxxxxxxxxxxxxxxxxx`
 
-2. **Enter Your Token:**
-   - For GitHub: Personal Access Token with 'copilot' scope
-   - For OpenAI: API key from OpenAI dashboard
-
-3. **Save Configuration:**
+2. **Save Configuration:**
    - Token is stored securely in your browser session only
    - Never saved permanently or shared with others
    - Automatically cleared when you close your browser
@@ -68,7 +64,7 @@ For individual users who want to provide their own API tokens via the web interf
 
 - 🔒 **Session Storage Only**: Tokens are stored temporarily in your browser
 - 🛡️ **Secure Headers**: Tokens sent via secure request headers
-- ✅ **Format Validation**: Basic token format checking
+- ✅ **Format Validation**: Basic token format checking for OpenAI keys
 - 🚫 **No Logging**: Tokens are never logged or stored on the server
 
 ## 🧪 Test Aitor
@@ -80,7 +76,7 @@ For individual users who want to provide their own API tokens via the web interf
 
 2. Navigate to http://localhost:3000/ai-advisor
 
-3. Try asking AI Aitor a gardening question!
+3. Try asking Aitor a gardening question!
 
 ## 🌱 Example Questions for AI Aitor
 
@@ -94,9 +90,7 @@ For individual users who want to provide their own API tokens via the web interf
 
 ### Model Selection
 
-The integration automatically uses the best available model:
-- With GitHub Token: Uses GitHub Copilot's models (gpt-4o, etc.)
-- With OpenAI Key: Uses OpenAI's GPT-4
+Aitor uses OpenAI's gpt-4o-mini model by default, which provides excellent gardening advice at a reasonable cost.
 
 ### Customizing AI Aitor's Personality
 
@@ -110,17 +104,12 @@ const AITOR_SYSTEM_PROMPT = `You are AI Aitor, the friendly allotment gardening 
 
 ### "AI service not configured" Error
 
-Make sure your `.env.local` file contains either:
-- `GITHUB_TOKEN=your_token` (recommended)
-- `OPENAI_API_KEY=your_key` (fallback)
-
-### GitHub Token Permissions
-
-Ensure your GitHub token has the `copilot` scope enabled.
+Make sure your `.env.local` file contains:
+- `OPENAI_API_KEY=your_openai_api_key`
 
 ### Rate Limits
 
-GitHub Copilot has usage limits. If you hit them, the system will show an error. You can add an OpenAI key as a fallback.
+OpenAI has usage limits based on your account tier. If you hit them, the system will show an error. Check your OpenAI dashboard for usage and billing information.
 
 ## 🚀 Deployment
 
@@ -128,14 +117,14 @@ When deploying to production, add your environment variables to your hosting pla
 
 ### Vercel
 ```bash
-vercel env add GITHUB_TOKEN
+vercel env add OPENAI_API_KEY
 ```
 
 ### Netlify
 Add in your Netlify dashboard under Site Settings > Environment Variables
 
 ### Other platforms
-Add `GITHUB_TOKEN` to your environment variables configuration.
+Add `OPENAI_API_KEY` to your environment variables configuration.
 
 ---
 
