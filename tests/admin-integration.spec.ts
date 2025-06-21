@@ -4,8 +4,8 @@ test.describe('Admin Dashboard Integration', () => {
   test('should display real announcements from API', async ({ page }) => {
     await page.goto('/admin?test-mode=true');
 
-    // Wait for data to load
-    await page.waitForLoadState('networkidle');
+    // Wait for content to load instead of networkidle
+    await page.waitForSelector('[data-testid="new-announcement-button"]', { timeout: 45000 });
 
     // Check that demo announcements are displayed
     await expect(page.getByText('Bark Mulch Delivery - This Saturday').first()).toBeVisible();
@@ -37,7 +37,8 @@ test.describe('Admin Dashboard Integration', () => {
     });
 
     await page.goto('/admin?test-mode=true');
-    await page.waitForLoadState('networkidle');
+    // Wait for content to load instead of networkidle
+    await page.waitForSelector('[data-testid="new-announcement-button"]', { timeout: 45000 });
 
     // Should show error message and fallback to static data
     // This tests our error handling logic falls back correctly
@@ -47,7 +48,7 @@ test.describe('Admin Dashboard Integration', () => {
 
   test('should display correct status indicators', async ({ page }) => {
     await page.goto('/admin?test-mode=true');
-    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="new-announcement-button"]', { timeout: 45000 });
 
     // Check that both active and inactive announcements are handled
     // The inactive "Water Conservation Workshop" should show as draft
@@ -58,7 +59,7 @@ test.describe('Admin Dashboard Integration', () => {
 
   test('should display engagement metrics correctly', async ({ page }) => {
     await page.goto('/admin?test-mode=true');
-    await page.waitForLoadState('networkidle');
+    await page.waitForSelector('[data-testid="new-announcement-button"]', { timeout: 45000 });
 
     // Check for engagement metrics structure
     const engagementCells = page.locator('td').filter({ hasText: /\d+/ });

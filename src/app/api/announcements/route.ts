@@ -66,7 +66,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 400 })
     }
     
-    const body = await request.json()
+    let body;
+    try {
+      const rawBody = await request.text()
+      console.log('Raw request body:', rawBody)
+      
+      if (!rawBody || rawBody.trim() === '') {
+        console.error('Empty request body')
+        return NextResponse.json({ error: 'Request body is empty' }, { status: 400 })
+      }
+      
+      body = JSON.parse(rawBody)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
+    
     console.log('Request body:', body)
     const { type, title, content, author, priority } = body
 

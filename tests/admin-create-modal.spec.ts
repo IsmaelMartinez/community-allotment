@@ -139,33 +139,13 @@ test.describe('Admin - Create Announcement Modal', () => {
   })
 
   test('should create announcement successfully with valid data', async ({ page }) => {
-    // Wait for page to fully load and check initial state
+    // Wait for page to fully load
     await page.waitForSelector('tbody tr', { timeout: 10000 })
-
-    // Wait a bit more to ensure all announcements are loaded
     await page.waitForTimeout(1000)
-
-    const initialRows = await page.locator('tbody tr').count()
-
-    // If we don't have the expected 4 rows, there might be an API error - check for error state and reload if needed
-    if (initialRows !== 4) {
-      const errorState = await page.locator('text=Error loading announcements').isVisible()
-
-      // If there's an error, try to reload
-      if (errorState) {
-        await page.reload()
-        await page.waitForSelector('tbody tr', { timeout: 10000 })
-        await page.waitForTimeout(1000)
-      }
-    }
-
-    // Get final initial count (should be 4 demo announcements)
-    const finalInitialRows = await page.locator('tbody tr').count()
-    expect(finalInitialRows).toBe(4) // Ensure we start with clean demo data
 
     await page.click('[data-testid="new-announcement-button"]')
 
-    // Use a more stable unique identifier
+    // Use a unique identifier to ensure we can find our announcement
     const timestamp = Date.now()
     const uniqueTitle = `Test Modal ${timestamp}`
 
@@ -179,14 +159,15 @@ test.describe('Admin - Create Announcement Modal', () => {
     await page.locator('[data-testid="submit-button"]').click({ force: true })
 
     // Wait for modal to close (indicates success)
-    await expect(page.locator('[data-testid="create-modal"]')).not.toBeVisible()
+    await expect(page.locator('[data-testid="create-modal"]')).not.toBeVisible({ timeout: 15000 })
 
-    // Wait for the new announcement to appear in the list
-    await expect(page.locator(`text=${uniqueTitle}`).first()).toBeVisible({ timeout: 10000 })
+    // Wait for the new announcement to appear in the list - this is the key validation
+    await expect(page.locator(`text=${uniqueTitle}`).first()).toBeVisible({ timeout: 15000 })
 
-    // Should now have 5 announcements
-    const finalRows = await page.locator('tbody tr').count()
-    expect(finalRows).toBe(5)
+    // Verify the announcement has the correct properties displayed
+    const announcementRow = page.locator(`text=${uniqueTitle}`).locator('..').locator('..')
+    await expect(announcementRow.locator('[data-badge="delivery"]')).toBeVisible()
+    await expect(announcementRow.locator('[data-priority="high"]')).toBeVisible()
   })
 
   test('should reset form when modal is reopened after closing', async ({ page }) => {

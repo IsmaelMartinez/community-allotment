@@ -12,7 +12,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : 4,  // Increased workers for better parallelism
+  workers: process.env.CI ? 1 : 50,  // Increased workers for better parallelism
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],  // Console output
@@ -36,7 +36,12 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        // Increase timeout for Firefox as it's slower
+        actionTimeout: 15000,
+        navigationTimeout: 45000,
+      },
     },
 
     {
