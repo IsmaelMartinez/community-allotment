@@ -3,25 +3,34 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { Announcement } from '../route'
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
+function getDataFile(request?: NextRequest): string {
+  // Check if we're in test mode and have a worker ID header
+  if (process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_MODE === 'true' && request) {
+    const workerHeader = request.headers.get('x-playwright-worker-id')
+    if (workerHeader) {
+      return path.join(process.cwd(), 'data', `announcements-test-${workerHeader}.json`)
+    }
+  }
+  return path.join(process.cwd(), 'data', 'announcements.json')
+}
 
-async function readAnnouncements(): Promise<Announcement[]> {
+async function readAnnouncements(dataFile: string): Promise<Announcement[]> {
   try {
-    const data = await fs.readFile(DATA_FILE, 'utf-8')
+    const data = await fs.readFile(dataFile, 'utf-8')
     return JSON.parse(data)
   } catch {
     return []
   }
 }
 
-async function writeAnnouncements(announcements: Announcement[]): Promise<void> {
-  const dataDir = path.dirname(DATA_FILE)
+async function writeAnnouncements(dataFile: string, announcements: Announcement[]): Promise<void> {
+  const dataDir = path.dirname(dataFile)
   try {
     await fs.access(dataDir)
   } catch {
     await fs.mkdir(dataDir, { recursive: true })
   }
-  await fs.writeFile(DATA_FILE, JSON.stringify(announcements, null, 2))
+  await fs.writeFile(dataFile, JSON.stringify(announcements, null, 2))
 }
 
 export async function PUT(
@@ -30,8 +39,9 @@ export async function PUT(
 ) {
   const { id } = await params
   try {
+    const dataFile = getDataFile(request)
     const body = await request.json()
-    const announcements = await readAnnouncements()
+    const announcements = await readAnnouncements(dataFile)
     const index = announcements.findIndex(a => a.id === id)
 
     if (index === -1) {
@@ -44,7 +54,7 @@ export async function PUT(
       updatedAt: new Date().toISOString()
     }
 
-    await writeAnnouncements(announcements)
+    await writeAnnouncements(dataFile, announcements)
     return NextResponse.json(announcements[index])
   } catch (error) {
     console.error('Error updating announcement:', error)
@@ -58,7 +68,8 @@ export async function DELETE(
 ) {
   const { id } = await params
   try {
-    const announcements = await readAnnouncements()
+    const dataFile = getDataFile(request)
+    const announcements = await readAnnouncements(dataFile)
     const index = announcements.findIndex(a => a.id === id)
 
     if (index === -1) {
@@ -69,7 +80,7 @@ export async function DELETE(
     announcements[index].isActive = false
     announcements[index].updatedAt = new Date().toISOString()
 
-    await writeAnnouncements(announcements)
+    await writeAnnouncements(dataFile, announcements)
     return NextResponse.json({ message: 'Announcement deleted successfully' })
   } catch (error) {
     console.error('Error deleting announcement:', error)

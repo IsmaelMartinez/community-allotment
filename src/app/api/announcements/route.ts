@@ -15,10 +15,19 @@ export interface Announcement {
   updatedAt: string
 }
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
+function getDataFile(request?: NextRequest): string {
+  // Check if we're in test mode and have a worker ID header
+  if (process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_MODE === 'true' && request) {
+    const workerHeader = request.headers.get('x-playwright-worker-id')
+    if (workerHeader) {
+      return path.join(process.cwd(), 'data', `announcements-test-${workerHeader}.json`)
+    }
+  }
+  return path.join(process.cwd(), 'data', 'announcements.json')
+}
 
-async function ensureDataDir() {
-  const dataDir = path.dirname(DATA_FILE)
+async function ensureDataDir(dataFile: string) {
+  const dataDir = path.dirname(dataFile)
   try {
     await fs.access(dataDir)
   } catch {
@@ -26,24 +35,25 @@ async function ensureDataDir() {
   }
 }
 
-async function readAnnouncements(): Promise<Announcement[]> {
+async function readAnnouncements(dataFile: string): Promise<Announcement[]> {
   try {
-    await ensureDataDir()
-    const data = await fs.readFile(DATA_FILE, 'utf-8')
+    await ensureDataDir(dataFile)
+    const data = await fs.readFile(dataFile, 'utf-8')
     return JSON.parse(data)
   } catch {
     return []
   }
 }
 
-async function writeAnnouncements(announcements: Announcement[]): Promise<void> {
-  await ensureDataDir()
-  await fs.writeFile(DATA_FILE, JSON.stringify(announcements, null, 2))
+async function writeAnnouncements(dataFile: string, announcements: Announcement[]): Promise<void> {
+  await ensureDataDir(dataFile)
+  await fs.writeFile(dataFile, JSON.stringify(announcements, null, 2))
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const announcements = await readAnnouncements()
+    const dataFile = getDataFile(request)
+    const announcements = await readAnnouncements(dataFile)
     const activeAnnouncements = announcements
       .filter(a => a.isActive)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -57,6 +67,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const dataFile = getDataFile(request)
     const contentType = request.headers.get('content-type')
     
     if (!contentType?.includes('application/json')) {
@@ -98,7 +109,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid priority level' }, { status: 400 })
     }
 
-    const announcements = await readAnnouncements()
+    const announcements = await readAnnouncements(dataFile)
     const newAnnouncement: Announcement = {
       id: Date.now().toString(),
       type,
@@ -113,7 +124,7 @@ export async function POST(request: NextRequest) {
     }
 
     announcements.push(newAnnouncement)
-    await writeAnnouncements(announcements)
+    await writeAnnouncements(dataFile, announcements)
 
     return NextResponse.json(newAnnouncement, { status: 201 })
   } catch (error) {

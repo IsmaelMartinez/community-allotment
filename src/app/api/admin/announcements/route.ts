@@ -1,22 +1,32 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { Announcement } from '../../announcements/route'
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'announcements.json')
+function getDataFile(request?: NextRequest): string {
+  // Check if we're in test mode and have a worker ID header
+  if (process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_MODE === 'true' && request) {
+    const workerHeader = request.headers.get('x-playwright-worker-id')
+    if (workerHeader) {
+      return path.join(process.cwd(), 'data', `announcements-test-${workerHeader}.json`)
+    }
+  }
+  return path.join(process.cwd(), 'data', 'announcements.json')
+}
 
-async function readAnnouncements(): Promise<Announcement[]> {
+async function readAnnouncements(dataFile: string): Promise<Announcement[]> {
   try {
-    const data = await fs.readFile(DATA_FILE, 'utf-8')
+    const data = await fs.readFile(dataFile, 'utf-8')
     return JSON.parse(data)
   } catch {
     return []
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const announcements = await readAnnouncements()
+    const dataFile = getDataFile(request)
+    const announcements = await readAnnouncements(dataFile)
     // Return all announcements (including inactive) sorted by creation date
     const sortedAnnouncements = [...announcements]
     sortedAnnouncements.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
