@@ -8,6 +8,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/announcements', label: 'Announcements' },
   { href: '/calendar', label: 'Calendar' },
+  { href: '/garden-planner', label: 'Garden Planner' },
   { href: '/companion-planting', label: 'Companion Planting' },
   { href: '/composting', label: 'Composting' },
   { href: '/ai-advisor', label: 'Aitor' },
