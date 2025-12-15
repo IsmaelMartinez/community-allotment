@@ -42,7 +42,9 @@ export default function AnnouncementsPage() {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await fetch('/api/announcements')
+      // Use static data file for GitHub Pages compatibility
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+      const response = await fetch(`${basePath}/data/announcements.json`)
       if (response.ok) {
         const data = await response.json()
         setAnnouncements(data)
