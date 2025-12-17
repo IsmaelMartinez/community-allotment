@@ -163,7 +163,7 @@ export default function CompanionPlantingPage() {
 
                 <div>
                   <h4 className="text-sm font-semibold text-red-700 mb-1">Avoid Planting With:</h4>
-                  <p className="text-sm text-gray-600">{pair.avoid}</p>
+                  <p className="text-sm text-gray-600">{pair.avoid.join(', ')}</p>
                 </div>
               </div>
             ))}
