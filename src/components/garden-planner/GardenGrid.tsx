@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Plus, X, Trash2, Search } from 'lucide-react'
-import { GridPlot, PlotCell, CATEGORY_INFO } from '@/types/garden-planner'
+import { useState, useEffect } from 'react'
+import { Plus, Minus, X, Trash2, Search } from 'lucide-react'
+import { GridPlot, PlotCell, CATEGORY_INFO, VegetableCategory } from '@/types/garden-planner'
 import { vegetables, getVegetableById } from '@/lib/vegetable-database'
 import { checkCompanionCompatibility } from '@/lib/companion-validation'
 
@@ -10,39 +10,35 @@ interface GardenGridProps {
   grid: GridPlot
   onAssign: (cellId: string, vegetableId: string) => void
   onClear: (cellId: string) => void
-  onAddRow: () => void
+  onResize: (rows: number, cols: number) => void
   onClearAll: () => void
 }
 
-export default function GardenGrid({ grid, onAssign, onClear, onAddRow, onClearAll }: GardenGridProps) {
-  const [activeCell, setActiveCell] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const searchRef = useRef<HTMLInputElement>(null)
+const MIN_SIZE = 1
+const MAX_SIZE = 8
 
-  // Close dropdown when clicking outside
+export default function GardenGrid({ grid, onAssign, onClear, onResize, onClearAll }: GardenGridProps) {
+  const [selectedCell, setSelectedCell] = useState<PlotCell | null>(null)
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<VegetableCategory | 'all'>('all')
+
+  // Close dialog on escape
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setActiveCell(null)
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setSelectedCell(null)
         setSearch('')
+        setCategoryFilter('all')
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
   }, [])
-
-  // Focus search when dropdown opens
-  useEffect(() => {
-    if (activeCell && searchRef.current) {
-      searchRef.current.focus()
-    }
-  }, [activeCell])
 
   // Get compatibility color for a plant based on what's already planted
   function getCompatibility(vegetableId: string): 'good' | 'neutral' | 'bad' {
     const plantedVegIds = grid.cells
-      .filter(c => c.vegetableId && c.id !== activeCell)
+      .filter(c => c.vegetableId && c.id !== selectedCell?.id)
       .map(c => c.vegetableId!)
 
     if (plantedVegIds.length === 0) return 'neutral'
@@ -61,6 +57,15 @@ export default function GardenGrid({ grid, onAssign, onClear, onAddRow, onClearA
     return 'neutral'
   }
 
+  // Check if removing row/col would delete plants
+  function hasPlantInLastRow(): boolean {
+    return grid.cells.some(c => c.row === grid.gridRows - 1 && c.vegetableId)
+  }
+
+  function hasPlantInLastCol(): boolean {
+    return grid.cells.some(c => c.col === grid.gridCols - 1 && c.vegetableId)
+  }
+
   // Build cells into rows
   const rows: PlotCell[][] = []
   for (let r = 0; r < grid.gridRows; r++) {
@@ -73,38 +78,111 @@ export default function GardenGrid({ grid, onAssign, onClear, onAddRow, onClearA
   }
 
   // Filter plants
-  const filteredPlants = vegetables.filter(v =>
-    !search || v.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredPlants = vegetables.filter(v => {
+    const matchesSearch = !search || v.name.toLowerCase().includes(search.toLowerCase())
+    const matchesCategory = categoryFilter === 'all' || v.category === categoryFilter
+    return matchesSearch && matchesCategory
+  })
 
   const planted = grid.cells.filter(c => c.vegetableId).length
+  const selectedVeg = selectedCell?.vegetableId ? getVegetableById(selectedCell.vegetableId) : null
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      {/* Grid */}
-      <div className="p-4">
-        <div className="space-y-2">
-          {rows.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex gap-2">
-              {row.map(cell => {
-                const veg = cell.vegetableId ? getVegetableById(cell.vegetableId) : null
-                const isActive = activeCell === cell.id
+    <>
+      <div className="bg-white rounded-b-xl shadow-md overflow-hidden">
+        {/* Size Controls */}
+        <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-4">
+            {/* Rows */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Rows:</span>
+              <button
+                onClick={() => onResize(grid.gridRows - 1, grid.gridCols)}
+                disabled={grid.gridRows <= MIN_SIZE}
+                className={`p-1.5 rounded transition ${
+                  grid.gridRows <= MIN_SIZE 
+                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
+                    : hasPlantInLastRow()
+                      ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title={hasPlantInLastRow() ? 'Warning: Last row has plants' : 'Remove row'}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-6 text-center font-medium text-gray-800">{grid.gridRows}</span>
+              <button
+                onClick={() => onResize(grid.gridRows + 1, grid.gridCols)}
+                disabled={grid.gridRows >= MAX_SIZE}
+                className={`p-1.5 rounded transition ${
+                  grid.gridRows >= MAX_SIZE
+                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
 
-                return (
-                  <div key={cell.id} className="relative flex-1">
+            {/* Columns */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Cols:</span>
+              <button
+                onClick={() => onResize(grid.gridRows, grid.gridCols - 1)}
+                disabled={grid.gridCols <= MIN_SIZE}
+                className={`p-1.5 rounded transition ${
+                  grid.gridCols <= MIN_SIZE
+                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                    : hasPlantInLastCol()
+                      ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title={hasPlantInLastCol() ? 'Warning: Last column has plants' : 'Remove column'}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-6 text-center font-medium text-gray-800">{grid.gridCols}</span>
+              <button
+                onClick={() => onResize(grid.gridRows, grid.gridCols + 1)}
+                disabled={grid.gridCols >= MAX_SIZE}
+                className={`p-1.5 rounded transition ${
+                  grid.gridCols >= MAX_SIZE
+                    ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <span className="text-sm text-gray-500">
+            {grid.gridRows}×{grid.gridCols} = {grid.gridRows * grid.gridCols} cells
+          </span>
+        </div>
+
+        {/* Grid */}
+        <div className="p-4">
+          <div className="space-y-2">
+            {rows.map((row, rowIndex) => (
+              <div key={rowIndex} className="flex gap-2">
+                {row.map(cell => {
+                  const veg = cell.vegetableId ? getVegetableById(cell.vegetableId) : null
+
+                  return (
                     <button
+                      key={cell.id}
                       onClick={() => {
-                        setActiveCell(isActive ? null : cell.id)
+                        setSelectedCell(cell)
                         setSearch('')
+                        setCategoryFilter('all')
                       }}
                       className={`
-                        w-full aspect-square rounded-lg border-2 transition-all
+                        flex-1 aspect-square rounded-lg border-2 transition-all
                         flex flex-col items-center justify-center p-2
-                        ${isActive
-                          ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
-                          : veg
-                            ? 'border-green-200 bg-green-50 hover:border-green-300'
-                            : 'border-dashed border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ${veg
+                          ? 'border-green-200 bg-green-50 hover:border-green-300'
+                          : 'border-dashed border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }
                       `}
                     >
@@ -124,129 +202,179 @@ export default function GardenGrid({ grid, onAssign, onClear, onAddRow, onClearA
                         <Plus className="w-5 h-5 text-gray-300" />
                       )}
                     </button>
-
-                    {/* Inline dropdown */}
-                    {isActive && (
-                      <div
-                        ref={dropdownRef}
-                        className="absolute z-50 top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
-                        style={{ minWidth: '16rem' }}
-                      >
-                        {/* Search */}
-                        <div className="p-2 border-b">
-                          <div className="relative">
-                            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                              ref={searchRef}
-                              type="text"
-                              placeholder="Search plants..."
-                              value={search}
-                              onChange={(e) => setSearch(e.target.value)}
-                              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Legend */}
-                        <div className="px-2 py-1.5 bg-gray-50 border-b flex gap-3 text-[10px] text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-green-500"></span> Good
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-blue-400"></span> Neutral
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-red-500"></span> Avoid
-                          </span>
-                        </div>
-
-                        {/* Plant list */}
-                        <div className="max-h-48 overflow-y-auto">
-                          {filteredPlants.map(plant => {
-                            const compat = getCompatibility(plant.id)
-                            const bgColor = compat === 'good' 
-                              ? 'bg-green-50 hover:bg-green-100' 
-                              : compat === 'bad'
-                              ? 'bg-red-50 hover:bg-red-100'
-                              : 'bg-white hover:bg-gray-50'
-                            const borderColor = compat === 'good'
-                              ? 'border-l-green-500'
-                              : compat === 'bad'
-                              ? 'border-l-red-500'
-                              : 'border-l-blue-300'
-
-                            return (
-                              <button
-                                key={plant.id}
-                                onClick={() => {
-                                  onAssign(cell.id, plant.id)
-                                  setActiveCell(null)
-                                  setSearch('')
-                                }}
-                                className={`w-full px-3 py-2 text-left flex items-center gap-2 border-l-4 ${bgColor} ${borderColor}`}
-                              >
-                                <span className="text-lg">{getPlantEmoji(plant.category)}</span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-sm font-medium text-gray-800 truncate">{plant.name}</div>
-                                  <div className="text-[10px] text-gray-500 truncate">
-                                    {CATEGORY_INFO.find(c => c.id === plant.category)?.name}
-                                  </div>
-                                </div>
-                              </button>
-                            )
-                          })}
-                        </div>
-
-                        {/* Remove option if cell has plant */}
-                        {veg && (
-                          <div className="p-2 border-t">
-                            <button
-                              onClick={() => {
-                                onClear(cell.id)
-                                setActiveCell(null)
-                              }}
-                              className="w-full py-1.5 text-sm text-red-600 hover:bg-red-50 rounded flex items-center justify-center gap-1"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                              Remove {veg.name}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          ))}
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Add Row button */}
-        {grid.gridRows < 8 && (
-          <button
-            onClick={onAddRow}
-            className="w-full mt-3 py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-300 hover:text-gray-500 transition flex items-center justify-center gap-1 text-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Row
-          </button>
+        {/* Footer */}
+        {planted > 0 && (
+          <div className="px-4 py-3 bg-gray-50 border-t flex items-center justify-between">
+            <span className="text-sm text-gray-500">{planted} plants in this bed</span>
+            <button
+              onClick={onClearAll}
+              className="text-sm text-red-500 hover:text-red-600 flex items-center gap-1"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear All
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Footer */}
-      {planted > 0 && (
-        <div className="px-4 py-3 bg-gray-50 border-t flex items-center justify-between">
-          <span className="text-sm text-gray-500">{planted} plants in your garden</span>
-          <button
-            onClick={onClearAll}
-            className="text-sm text-red-500 hover:text-red-600 flex items-center gap-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            Clear All
-          </button>
+      {/* Plant Selection Dialog */}
+      {selectedCell && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedCell(null)
+              setSearch('')
+              setCategoryFilter('all')
+            }
+          }}
+        >
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {selectedVeg ? `Change plant in cell` : `Select a plant`}
+                </h2>
+                {selectedVeg && (
+                  <p className="text-sm text-gray-500">Currently: {selectedVeg.name}</p>
+                )}
+              </div>
+              <button 
+                onClick={() => {
+                  setSelectedCell(null)
+                  setSearch('')
+                  setCategoryFilter('all')
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="p-4 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search plants..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="px-4 py-2 border-b overflow-x-auto">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCategoryFilter('all')}
+                  className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition ${
+                    categoryFilter === 'all'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  All
+                </button>
+                {CATEGORY_INFO.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategoryFilter(cat.id)}
+                    className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition flex items-center gap-1 ${
+                      categoryFilter === cat.id
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {getPlantEmoji(cat.id)} {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="px-4 py-2 bg-gray-50 flex gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-green-500"></span> Good companion
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-blue-400"></span> Neutral
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-red-500"></span> Avoid
+              </span>
+            </div>
+
+            {/* Plant list */}
+            <div className="flex-1 overflow-y-auto p-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {filteredPlants.map(plant => {
+                  const compat = getCompatibility(plant.id)
+                  const bgColor = compat === 'good' 
+                    ? 'bg-green-50 hover:bg-green-100 border-green-200' 
+                    : compat === 'bad'
+                    ? 'bg-red-50 hover:bg-red-100 border-red-200'
+                    : 'bg-white hover:bg-gray-50 border-gray-200'
+
+                  return (
+                    <button
+                      key={plant.id}
+                      onClick={() => {
+                        onAssign(selectedCell.id, plant.id)
+                        setSelectedCell(null)
+                        setSearch('')
+                        setCategoryFilter('all')
+                      }}
+                      className={`p-3 rounded-lg border text-left transition-all ${bgColor}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{getPlantEmoji(plant.category)}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-gray-800 truncate">{plant.name}</div>
+                          <div className="text-xs text-gray-500 truncate">
+                            {CATEGORY_INFO.find(c => c.id === plant.category)?.name}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+              {filteredPlants.length === 0 && (
+                <p className="text-center text-gray-400 py-8">No plants found</p>
+              )}
+            </div>
+
+            {/* Remove button */}
+            {selectedVeg && (
+              <div className="p-4 border-t">
+                <button
+                  onClick={() => {
+                    onClear(selectedCell.id)
+                    setSelectedCell(null)
+                  }}
+                  className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-lg border border-red-200 font-medium flex items-center justify-center gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  Remove {selectedVeg.name}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -264,4 +392,3 @@ function getPlantEmoji(category: string): string {
   }
   return emojis[category] || '🌱'
 }
-

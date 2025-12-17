@@ -2,48 +2,111 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Sprout, Users, Recycle, Calendar } from 'lucide-react'
+import { Sprout, Users, Recycle, Calendar, Plus, Trash2, Edit2, Check, X } from 'lucide-react'
 import { GridPlot, PlotCell } from '@/types/garden-planner'
 import { createGridPlot } from '@/lib/garden-storage'
 import { checkCompanionCompatibility } from '@/lib/companion-validation'
 import { getVegetableById } from '@/lib/vegetable-database'
 import GardenGrid from '@/components/garden-planner/GardenGrid'
 
-const STORAGE_KEY = 'garden-grid-2025'
+const STORAGE_KEY = 'garden-beds-2025'
 const DEFAULT_ROWS = 4
 const DEFAULT_COLS = 4
 
+interface GardenData {
+  beds: GridPlot[]
+  activeBedId: string | null
+}
+
 export default function GardenPlannerPage() {
-  const [grid, setGrid] = useState<GridPlot | null>(null)
+  const [data, setData] = useState<GardenData | null>(null)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [editingBedId, setEditingBedId] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState('')
 
   // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       try {
-        setGrid(JSON.parse(saved))
+        const parsed = JSON.parse(saved)
+        // Handle old format (single grid)
+        if (parsed.gridRows !== undefined) {
+          const beds = [parsed as GridPlot]
+          setData({ beds, activeBedId: beds[0].id })
+        } else {
+          setData(parsed)
+        }
       } catch {
-        setGrid(createGridPlot('My Garden', DEFAULT_ROWS, DEFAULT_COLS))
+        const defaultBed = createGridPlot('Bed 1', DEFAULT_ROWS, DEFAULT_COLS)
+        setData({ beds: [defaultBed], activeBedId: defaultBed.id })
       }
     } else {
-      setGrid(createGridPlot('My Garden', DEFAULT_ROWS, DEFAULT_COLS))
+      const defaultBed = createGridPlot('Bed 1', DEFAULT_ROWS, DEFAULT_COLS)
+      setData({ beds: [defaultBed], activeBedId: defaultBed.id })
     }
   }, [])
 
   // Save to localStorage
   useEffect(() => {
-    if (grid) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(grid))
+    if (data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     }
-  }, [grid])
+  }, [data])
+
+  // Get active bed
+  const activeBed = data?.beds.find(b => b.id === data.activeBedId) || data?.beds[0]
+
+  // Select bed
+  function handleSelectBed(bedId: string) {
+    if (!data) return
+    setData({ ...data, activeBedId: bedId })
+  }
+
+  // Add new bed
+  function handleAddBed() {
+    if (!data) return
+    const newBed = createGridPlot(`Bed ${data.beds.length + 1}`, DEFAULT_ROWS, DEFAULT_COLS)
+    setData({
+      beds: [...data.beds, newBed],
+      activeBedId: newBed.id
+    })
+  }
+
+  // Delete bed
+  function handleDeleteBed(bedId: string) {
+    if (!data || data.beds.length <= 1) return
+    const newBeds = data.beds.filter(b => b.id !== bedId)
+    setData({
+      beds: newBeds,
+      activeBedId: data.activeBedId === bedId ? newBeds[0].id : data.activeBedId
+    })
+  }
+
+  // Rename bed
+  function handleRenameBed(bedId: string, newName: string) {
+    if (!data) return
+    setData({
+      ...data,
+      beds: data.beds.map(b => b.id === bedId ? { ...b, name: newName } : b)
+    })
+    setEditingBedId(null)
+  }
+
+  // Update active bed
+  function updateActiveBed(updates: Partial<GridPlot>) {
+    if (!data || !activeBed) return
+    setData({
+      ...data,
+      beds: data.beds.map(b => b.id === activeBed.id ? { ...b, ...updates } : b)
+    })
+  }
 
   // Assign plant to cell
   function handleAssign(cellId: string, vegetableId: string) {
-    if (!grid) return
-    setGrid({
-      ...grid,
-      cells: grid.cells.map(cell =>
+    if (!activeBed) return
+    updateActiveBed({
+      cells: activeBed.cells.map(cell =>
         cell.id === cellId
           ? { ...cell, vegetableId, plantedYear: new Date().getFullYear() }
           : cell
@@ -53,10 +116,9 @@ export default function GardenPlannerPage() {
 
   // Clear cell
   function handleClear(cellId: string) {
-    if (!grid) return
-    setGrid({
-      ...grid,
-      cells: grid.cells.map(cell =>
+    if (!activeBed) return
+    updateActiveBed({
+      cells: activeBed.cells.map(cell =>
         cell.id === cellId
           ? { ...cell, vegetableId: undefined, plantedYear: undefined }
           : cell
@@ -64,32 +126,41 @@ export default function GardenPlannerPage() {
     })
   }
 
-  // Add row
-  function handleAddRow() {
-    if (!grid || grid.gridRows >= 8) return
-    const newRow = grid.gridRows
+  // Resize grid
+  function handleResize(newRows: number, newCols: number) {
+    if (!activeBed) return
+    
+    // Build new cells array
     const newCells: PlotCell[] = []
-    for (let col = 0; col < grid.gridCols; col++) {
-      newCells.push({
-        id: `${grid.id}-${newRow}-${col}`,
-        plotId: grid.id,
-        row: newRow,
-        col
-      })
+    for (let row = 0; row < newRows; row++) {
+      for (let col = 0; col < newCols; col++) {
+        // Try to find existing cell
+        const existing = activeBed.cells.find(c => c.row === row && c.col === col)
+        if (existing) {
+          newCells.push(existing)
+        } else {
+          newCells.push({
+            id: `${activeBed.id}-${row}-${col}`,
+            plotId: activeBed.id,
+            row,
+            col
+          })
+        }
+      }
     }
-    setGrid({
-      ...grid,
-      gridRows: grid.gridRows + 1,
-      cells: [...grid.cells, ...newCells]
+    
+    updateActiveBed({
+      gridRows: newRows,
+      gridCols: newCols,
+      cells: newCells
     })
   }
 
-  // Clear all
+  // Clear all plants in active bed
   function handleClearAll() {
-    if (!grid) return
-    setGrid({
-      ...grid,
-      cells: grid.cells.map(cell => ({
+    if (!activeBed) return
+    updateActiveBed({
+      cells: activeBed.cells.map(cell => ({
         ...cell,
         vegetableId: undefined,
         plantedYear: undefined
@@ -97,13 +168,13 @@ export default function GardenPlannerPage() {
     })
   }
 
-  // Get companion tips based on what's planted
-  function getCompanionTips(): string[] {
-    if (!grid) return []
-    const tips: string[] = []
-    const plantedCells = grid.cells.filter(c => c.vegetableId)
+  // Get companion tips for active bed
+  function getCompanionTips(): { good: string[], bad: string[] } {
+    if (!activeBed) return { good: [], bad: [] }
+    const good: string[] = []
+    const bad: string[] = []
+    const plantedCells = activeBed.cells.filter(c => c.vegetableId)
     
-    // Check pairs
     for (let i = 0; i < plantedCells.length; i++) {
       for (let j = i + 1; j < plantedCells.length; j++) {
         const veg1 = getVegetableById(plantedCells[i].vegetableId!)
@@ -112,18 +183,18 @@ export default function GardenPlannerPage() {
         
         const compat = checkCompanionCompatibility(veg1.id, veg2.id)
         if (compat === 'good') {
-          tips.push(`${veg1.name} + ${veg2.name} = Great companions!`)
+          good.push(`${veg1.name} + ${veg2.name}`)
         } else if (compat === 'bad') {
-          tips.push(`${veg1.name} + ${veg2.name} = Avoid planting together`)
+          bad.push(`${veg1.name} + ${veg2.name}`)
         }
       }
     }
     
-    return tips.slice(0, 3) // Max 3 tips
+    return { good: good.slice(0, 5), bad: bad.slice(0, 5) }
   }
 
   // Loading
-  if (!grid) {
+  if (!data || !activeBed) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center">
         <Sprout className="w-12 h-12 text-green-600 animate-pulse" />
@@ -132,7 +203,7 @@ export default function GardenPlannerPage() {
   }
 
   const tips = getCompanionTips()
-  const planted = grid.cells.filter(c => c.vegetableId).length
+  const totalPlants = data.beds.reduce((sum, bed) => sum + bed.cells.filter(c => c.vegetableId).length, 0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
@@ -143,7 +214,7 @@ export default function GardenPlannerPage() {
             <Sprout className="w-10 h-10 text-green-600 mr-3" />
             <div>
               <h1 className="text-2xl font-bold text-gray-800">My Edinburgh Garden 2025</h1>
-              <p className="text-sm text-gray-500">{planted} plants · Click a cell to add</p>
+              <p className="text-sm text-gray-500">{data.beds.length} beds · {totalPlants} plants</p>
             </div>
           </div>
           <button
@@ -159,39 +230,107 @@ export default function GardenPlannerPage() {
 
         {/* Quick Links */}
         <div className="flex gap-3 mb-6 text-sm">
-          <Link 
-            href="/companion-planting"
-            className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600"
-          >
+          <Link href="/companion-planting" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Users className="w-3.5 h-3.5" />
             Companions
           </Link>
-          <Link 
-            href="/composting"
-            className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600"
-          >
+          <Link href="/composting" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Recycle className="w-3.5 h-3.5" />
             Composting
           </Link>
-          <Link 
-            href="/ai-advisor"
-            className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600"
-          >
+          <Link href="/ai-advisor" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Sprout className="w-3.5 h-3.5" />
             Ask Aitor
           </Link>
         </div>
 
+        {/* Bed Tabs */}
+        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2">
+          {data.beds.map(bed => (
+            <button
+              key={bed.id}
+              onClick={() => handleSelectBed(bed.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${
+                bed.id === activeBed.id
+                  ? 'bg-green-600 text-white shadow'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 shadow-sm'
+              }`}
+            >
+              {bed.name}
+              {bed.cells.filter(c => c.vegetableId).length > 0 && (
+                <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${
+                  bed.id === activeBed.id ? 'bg-green-500' : 'bg-gray-200'
+                }`}>
+                  {bed.cells.filter(c => c.vegetableId).length}
+                </span>
+              )}
+            </button>
+          ))}
+          <button
+            onClick={handleAddBed}
+            className="px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-white hover:shadow-sm transition flex items-center gap-1"
+          >
+            <Plus className="w-4 h-4" />
+            Add Bed
+          </button>
+        </div>
+
+        {/* Active Bed Header */}
+        <div className="bg-white rounded-t-xl shadow-md px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {editingBedId === activeBed.id ? (
+              <>
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  className="px-2 py-1 border rounded text-sm font-medium"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleRenameBed(activeBed.id, editingName)
+                    if (e.key === 'Escape') setEditingBedId(null)
+                  }}
+                />
+                <button onClick={() => handleRenameBed(activeBed.id, editingName)} className="p-1 text-green-600 hover:bg-green-50 rounded">
+                  <Check className="w-4 h-4" />
+                </button>
+                <button onClick={() => setEditingBedId(null)} className="p-1 text-gray-400 hover:bg-gray-100 rounded">
+                  <X className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="font-medium text-gray-800">{activeBed.name}</span>
+                <button
+                  onClick={() => { setEditingBedId(activeBed.id); setEditingName(activeBed.name) }}
+                  className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
+          </div>
+          {data.beds.length > 1 && (
+            <button
+              onClick={() => handleDeleteBed(activeBed.id)}
+              className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+              title="Delete this bed"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
         {/* Calendar overlay */}
         {showCalendar && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="bg-white shadow-md p-6 mb-0 border-t">
             <h2 className="font-semibold text-gray-800 mb-4">Planting Calendar</h2>
             <div className="grid grid-cols-12 gap-1 text-xs">
               {['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'].map((m, i) => (
                 <div key={i} className="text-center text-gray-500 font-medium">{m}</div>
               ))}
-                </div>
-            {grid.cells.filter(c => c.vegetableId).map(cell => {
+            </div>
+            {activeBed.cells.filter(c => c.vegetableId).map(cell => {
               const veg = getVegetableById(cell.vegetableId!)
               if (!veg) return null
               return (
@@ -204,9 +343,7 @@ export default function GardenPlannerPage() {
                     return (
                       <div 
                         key={i} 
-                        className={`h-4 rounded-sm ${
-                          canHarvest ? 'bg-amber-400' : canSow ? 'bg-green-400' : 'bg-gray-100'
-                        }`}
+                        className={`h-4 rounded-sm ${canHarvest ? 'bg-amber-400' : canSow ? 'bg-green-400' : 'bg-gray-100'}`}
                         title={`${veg.name}: ${canSow ? 'Sow' : ''} ${canHarvest ? 'Harvest' : ''}`}
                       />
                     )
@@ -215,35 +352,50 @@ export default function GardenPlannerPage() {
                 </div>
               )
             })}
-            {planted === 0 && (
+            {activeBed.cells.filter(c => c.vegetableId).length === 0 && (
               <p className="text-gray-400 text-sm mt-4">Add plants to see their calendar</p>
             )}
             <div className="flex gap-4 mt-4 text-xs text-gray-500">
               <span className="flex items-center gap-1"><span className="w-3 h-3 bg-green-400 rounded"></span> Sow</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 bg-amber-400 rounded"></span> Harvest</span>
             </div>
-              </div>
-            )}
+          </div>
+        )}
 
         {/* Main Grid */}
         <GardenGrid
-          grid={grid}
+          grid={activeBed}
           onAssign={handleAssign}
           onClear={handleClear}
-          onAddRow={handleAddRow}
+          onResize={handleResize}
           onClearAll={handleClearAll}
         />
 
         {/* Companion Tips */}
-        {tips.length > 0 && (
+        {(tips.good.length > 0 || tips.bad.length > 0) && (
           <div className="mt-4 bg-white rounded-lg shadow-sm p-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Companion Tips</h3>
-            <div className="space-y-1">
-              {tips.map((tip, i) => (
-                <p key={i} className={`text-sm ${tip.includes('Avoid') ? 'text-red-600' : 'text-green-600'}`}>
-                  {tip}
-                </p>
-              ))}
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Companion Tips</h3>
+            <div className="space-y-3">
+              {tips.bad.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-red-600 mb-1">⚠️ Avoid together:</p>
+                  <div className="space-y-1">
+                    {tips.bad.map((tip, i) => (
+                      <p key={i} className="text-sm text-red-600 pl-4">{tip}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {tips.good.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-green-600 mb-1">✓ Great companions:</p>
+                  <div className="space-y-1">
+                    {tips.good.map((tip, i) => (
+                      <p key={i} className="text-sm text-green-600 pl-4">{tip}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
