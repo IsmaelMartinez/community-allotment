@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { Leaf, Users, Shield, Bug, Sprout, Calendar, ArrowRight, Star, Info } from 'lucide-react'
+import { Leaf, Users, Shield, Bug, Sprout, Calendar, Star, Info } from 'lucide-react'
+import GuideCTA from '@/components/GuideCTA'
 
 const companionPlantingPairs = [
   {
@@ -195,38 +195,20 @@ export default function CompanionPlantingPage() {
           </div>
         </section>
 
-        {/* AI Advisor CTA */}
-        <section className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-8 text-white text-center">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <Sprout className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-bold">Need Personalized Advice?</h2>
-            </div>
-            <p className="text-lg mb-6 text-green-100">
-              Get customized companion planting recommendations based on your specific plants, 
-              growing conditions, and seasonal timing with our AI garden advisor, Aitor.
-            </p>
-            <div className="bg-white/10 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-center mb-2">
-                <Info className="w-5 h-5 text-green-200 mr-2" />
-                <span className="text-green-200 font-medium">What Aitor can help with:</span>
-              </div>
-              <ul className="text-sm text-green-100 space-y-1">
-                <li>• Specific plant compatibility for your garden layout</li>
-                <li>• Timing recommendations for your location and climate</li>
-                <li>• Problem-solving for companion planting challenges</li>
-                <li>• Advanced three-sisters and polyculture planning</li>
-              </ul>
-            </div>
-            <Link 
-              href="/ai-advisor" 
-              className="inline-flex items-center bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-            >
-              Ask Aitor About Companion Planting
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </div>
-        </section>
+        <GuideCTA
+          icon={Sprout}
+          title="Need Personalized Advice?"
+          description="Get customized companion planting recommendations based on your specific plants, growing conditions, and seasonal timing with our AI garden advisor, Aitor."
+          bulletPoints={[
+            '• Specific plant compatibility for your garden layout',
+            '• Timing recommendations for your location and climate',
+            '• Problem-solving for companion planting challenges',
+            '• Advanced three-sisters and polyculture planning'
+          ]}
+          buttonText="Ask Aitor About Companion Planting"
+          gradientFrom="from-green-600"
+          gradientTo="to-blue-600"
+        />
 
         {/* Quick Reference */}
         <section className="mt-12">

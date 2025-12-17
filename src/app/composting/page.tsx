@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { Recycle, Leaf, Thermometer, Timer, Droplets, ArrowRight, Star, Info, AlertTriangle, CheckCircle, RotateCcw } from 'lucide-react'
+import { Recycle, Leaf, Thermometer, Timer, Droplets, Star, Info, AlertTriangle, CheckCircle, RotateCcw } from 'lucide-react'
+import GuideCTA from '@/components/GuideCTA'
 
 const compostingMethods = [
   {
@@ -387,38 +387,20 @@ export default function CompostingPage() {
           </div>
         </section>
 
-        {/* AI Advisor CTA */}
-        <section className="bg-gradient-to-r from-green-600 to-amber-600 rounded-lg p-8 text-white text-center">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <Recycle className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-bold">Need Composting Help?</h2>
-            </div>
-            <p className="text-lg mb-6 text-green-100">
-              Get personalized composting advice from our AI garden expert, Aitor. Whether you&apos;re troubleshooting 
-              problems or planning your compost system, Aitor can help!
-            </p>
-            <div className="bg-white/10 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-center mb-2">
-                <Info className="w-5 h-5 text-green-200 mr-2" />
-                <span className="text-green-200 font-medium">Ask Aitor about:</span>
-              </div>
-              <ul className="text-sm text-green-100 space-y-1">
-                <li>• Troubleshooting specific composting problems</li>
-                <li>• Composting systems for your space and needs</li>
-                <li>• Seasonal composting strategies and timing</li>
-                <li>• Using finished compost in your garden effectively</li>
-              </ul>
-            </div>
-            <Link 
-              href="/ai-advisor" 
-              className="inline-flex items-center bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-            >
-              Ask Aitor About Composting
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </div>
-        </section>
+        <GuideCTA
+          icon={Recycle}
+          title="Need Composting Help?"
+          description="Get personalized composting advice from our AI garden expert, Aitor. Whether you're troubleshooting problems or planning your compost system, Aitor can help!"
+          bulletPoints={[
+            '• Troubleshooting specific composting problems',
+            '• Composting systems for your space and needs',
+            '• Seasonal composting strategies and timing',
+            '• Using finished compost in your garden effectively'
+          ]}
+          buttonText="Ask Aitor About Composting"
+          gradientFrom="from-green-600"
+          gradientTo="to-amber-600"
+        />
 
         {/* Quick Reference */}
         <section className="mt-12">

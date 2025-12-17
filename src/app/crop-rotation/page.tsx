@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { RotateCcw, Leaf, Bug, Flower2, Sprout, ArrowRight, Star, Info, CheckCircle, AlertTriangle, Calendar } from 'lucide-react'
+import GuideCTA from '@/components/GuideCTA'
 
 const rotationBenefits = [
   {
@@ -420,38 +421,18 @@ export default function CropRotationPage() {
           </div>
         </section>
 
-        {/* AI Advisor CTA */}
-        <section className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg p-8 text-white text-center">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <RotateCcw className="w-8 h-8 mr-3" />
-              <h2 className="text-2xl font-bold">Need Rotation Help?</h2>
-            </div>
-            <p className="text-lg mb-6 text-green-100">
-              Get personalized crop rotation advice from our AI garden expert, Aitor. 
-              Ask about specific crops, soil conditions, or help planning your rotation!
-            </p>
-            <div className="bg-white/10 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-center mb-2">
-                <Info className="w-5 h-5 text-green-200 mr-2" />
-                <span className="text-green-200 font-medium">Ask Aitor about:</span>
-              </div>
-              <ul className="text-sm text-green-100 space-y-1">
-                <li>Which family does my crop belong to?</li>
-                <li>What should I plant after potatoes?</li>
-                <li>How do I deal with club root in my rotation?</li>
-                <li>Custom rotation plans for small plots</li>
-              </ul>
-            </div>
-            <Link 
-              href="/ai-advisor" 
-              className="inline-flex items-center bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-            >
-              Ask Aitor About Rotation
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </div>
-        </section>
+        <GuideCTA
+          icon={RotateCcw}
+          title="Need Rotation Help?"
+          description="Get personalized crop rotation advice from our AI garden expert, Aitor. Ask about specific crops, soil conditions, or help planning your rotation!"
+          bulletPoints={[
+            'Which family does my crop belong to?',
+            'What should I plant after potatoes?',
+            'How do I deal with club root in my rotation?',
+            'Custom rotation plans for small plots'
+          ]}
+          buttonText="Ask Aitor About Rotation"
+        />
 
         {/* Quick Reference */}
         <section className="mt-12">
