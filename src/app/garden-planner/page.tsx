@@ -229,7 +229,7 @@ export default function GardenPlannerPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="flex gap-3 mb-6 text-sm">
+        <div className="flex flex-wrap gap-3 mb-6 text-sm">
           <Link href="/companion-planting" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Users className="w-3.5 h-3.5" />
             Companions
@@ -237,6 +237,13 @@ export default function GardenPlannerPage() {
           <Link href="/composting" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Recycle className="w-3.5 h-3.5" />
             Composting
+          </Link>
+          <Link href="/crop-rotation" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-orange-600">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+            </svg>
+            Rotation
           </Link>
           <Link href="/ai-advisor" className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow text-gray-600 hover:text-green-600">
             <Sprout className="w-3.5 h-3.5" />

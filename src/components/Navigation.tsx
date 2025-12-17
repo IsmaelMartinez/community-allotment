@@ -1,28 +1,59 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Shield, Menu, X } from 'lucide-react'
+import { Shield, Menu, X, Book, ChevronDown, Users, Recycle, RotateCcw } from 'lucide-react'
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/announcements', label: 'Announcements' },
   { href: '/calendar', label: 'Calendar' },
   { href: '/garden-planner', label: 'Garden Planner' },
-  { href: '/companion-planting', label: 'Companion Planting' },
-  { href: '/composting', label: 'Composting' },
   { href: '/ai-advisor', label: 'Aitor' },
+]
+
+const growingGuides = [
+  { href: '/companion-planting', label: 'Companion Planting', icon: Users, description: 'Plants that grow well together' },
+  { href: '/composting', label: 'Composting', icon: Recycle, description: 'Turn waste into garden gold' },
+  { href: '/crop-rotation', label: 'Crop Rotation', icon: RotateCcw, description: 'Maximize soil health & yields' },
 ]
 
 export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isGuidesOpen, setIsGuidesOpen] = useState(false)
+  const [isMobileGuidesOpen, setIsMobileGuidesOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsGuidesOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Close dropdown on escape key
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsGuidesOpen(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
+    setIsMobileGuidesOpen(false)
   }
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false)
+    setIsMobileGuidesOpen(false)
   }
 
   return (
@@ -44,6 +75,51 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Growing Guides Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsGuidesOpen(!isGuidesOpen)}
+                onMouseEnter={() => setIsGuidesOpen(true)}
+                className="flex items-center space-x-1 hover:text-primary-200 transition"
+                aria-expanded={isGuidesOpen}
+                aria-haspopup="true"
+              >
+                <Book className="w-4 h-4" />
+                <span>Growing Guides</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isGuidesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isGuidesOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50"
+                  onMouseLeave={() => setIsGuidesOpen(false)}
+                >
+                  {growingGuides.map((guide) => {
+                    const IconComponent = guide.icon
+                    return (
+                      <Link
+                        key={guide.href}
+                        href={guide.href}
+                        className="flex items-start px-4 py-3 hover:bg-primary-50 transition group"
+                        onClick={() => setIsGuidesOpen(false)}
+                      >
+                        <IconComponent className="w-5 h-5 text-primary-600 mt-0.5 mr-3 flex-shrink-0" />
+                        <div>
+                          <div className="text-gray-800 font-medium group-hover:text-primary-600 transition">
+                            {guide.label}
+                          </div>
+                          <div className="text-gray-500 text-xs mt-0.5">
+                            {guide.description}
+                          </div>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
             
             {/* Admin Navigation */}
             <Link href="/admin" className="hover:text-primary-200 flex items-center space-x-1 transition">
@@ -70,7 +146,7 @@ export default function Navigation() {
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-primary-500 pt-4">
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col space-y-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -81,6 +157,40 @@ export default function Navigation() {
                   {link.label}
                 </Link>
               ))}
+              
+              {/* Mobile Growing Guides Expandable Section */}
+              <div className="px-3">
+                <button
+                  onClick={() => setIsMobileGuidesOpen(!isMobileGuidesOpen)}
+                  className="w-full flex items-center justify-between py-2 hover:text-primary-200 transition"
+                  aria-expanded={isMobileGuidesOpen}
+                >
+                  <div className="flex items-center space-x-2">
+                    <Book className="w-4 h-4" />
+                    <span>Growing Guides</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isMobileGuidesOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isMobileGuidesOpen && (
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary-400 pl-3">
+                    {growingGuides.map((guide) => {
+                      const IconComponent = guide.icon
+                      return (
+                        <Link
+                          key={guide.href}
+                          href={guide.href}
+                          className="flex items-center space-x-2 py-2 hover:text-primary-200 transition text-sm"
+                          onClick={closeMobileMenu}
+                        >
+                          <IconComponent className="w-4 h-4" />
+                          <span>{guide.label}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
               
               {/* Admin Navigation */}
               <Link 
