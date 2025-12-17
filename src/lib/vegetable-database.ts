@@ -1,7 +1,7 @@
 /**
  * Comprehensive vegetable database for the Garden Planner
- * Contains 30+ common allotment vegetables with planting and care information
- * Planting times are based on UK climate zones
+ * Planting times adjusted for Scotland / Edinburgh climate
+ * (Last frost ~late April/early May, first frost ~late September/October)
  */
 
 import { Vegetable, VegetableCategory } from '@/types/garden-planner'
@@ -12,12 +12,12 @@ export const vegetables: Vegetable[] = [
     id: 'lettuce',
     name: 'Lettuce',
     category: 'leafy-greens',
-    description: 'Fast-growing salad crop with many varieties. Great for succession planting.',
+    description: 'Fast-growing salad crop. Start indoors in Scotland for earlier harvest.',
     planting: {
-      sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7, 8],
-      transplantMonths: [4, 5, 6, 7, 8],
-      harvestMonths: [5, 6, 7, 8, 9, 10],
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [5, 6, 7, 8],
+      transplantMonths: [5, 6, 7, 8],
+      harvestMonths: [6, 7, 8, 9, 10],
       daysToHarvest: { min: 45, max: 75 }
     },
     care: {
@@ -28,7 +28,7 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Sow little and often for continuous harvest',
-        'Bolts quickly in hot weather',
+        'Scottish summers rarely cause bolting - bonus!',
         'Harvest outer leaves for cut-and-come-again'
       ]
     },
@@ -39,12 +39,12 @@ export const vegetables: Vegetable[] = [
     id: 'spinach',
     name: 'Spinach',
     category: 'leafy-greens',
-    description: 'Nutritious leafy green rich in iron. Prefers cooler temperatures.',
+    description: 'Nutritious leafy green. Thrives in cool Scottish climate.',
     planting: {
-      sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [3, 4, 5, 8, 9],
-      transplantMonths: [4, 5],
-      harvestMonths: [4, 5, 6, 7, 10, 11],
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [4, 5, 8, 9],
+      transplantMonths: [5, 6],
+      harvestMonths: [5, 6, 7, 8, 10, 11],
       daysToHarvest: { min: 40, max: 50 }
     },
     care: {
@@ -54,8 +54,8 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'beginner',
       tips: [
-        'Grows best in cool weather',
-        'Mulch to keep roots cool in summer',
+        'Perfect for Scottish climate - rarely bolts',
+        'Autumn sowings can overwinter with protection',
         'Pick outer leaves regularly'
       ]
     },
@@ -63,15 +63,42 @@ export const vegetables: Vegetable[] = [
     avoidPlants: []
   },
   {
+    id: 'perpetual-spinach',
+    name: 'Perpetual Spinach',
+    category: 'leafy-greens',
+    description: 'Hardy leaf beet that survives Scottish winters. Cut-and-come-again.',
+    planting: {
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [4, 5, 6, 7, 8],
+      transplantMonths: [5, 6],
+      harvestMonths: [6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4],
+      daysToHarvest: { min: 50, max: 60 }
+    },
+    care: {
+      sun: 'partial-shade',
+      water: 'moderate',
+      spacing: { between: 30, rows: 40 },
+      depth: 2,
+      difficulty: 'beginner',
+      tips: [
+        'Survives Scottish winters with minimal protection',
+        'Pick regularly to prevent bolting',
+        'One of the most productive greens for Scotland'
+      ]
+    },
+    companionPlants: ['Beans', 'Brassicas', 'Onions'],
+    avoidPlants: []
+  },
+  {
     id: 'kale',
     name: 'Kale',
     category: 'leafy-greens',
-    description: 'Hardy winter green that improves in flavor after frost.',
+    description: 'Hardy winter green - a Scottish staple! Improves after frost.',
     planting: {
-      sowIndoorsMonths: [3, 4, 5],
-      sowOutdoorsMonths: [4, 5, 6, 7],
-      transplantMonths: [5, 6, 7, 8],
-      harvestMonths: [9, 10, 11, 12, 1, 2, 3],
+      sowIndoorsMonths: [4, 5],
+      sowOutdoorsMonths: [5, 6, 7],
+      transplantMonths: [6, 7, 8],
+      harvestMonths: [9, 10, 11, 12, 1, 2, 3, 4],
       daysToHarvest: { min: 55, max: 75 }
     },
     care: {
@@ -81,9 +108,9 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'beginner',
       tips: [
-        'Frost improves flavor',
+        'Frost sweetens the leaves - perfect for Scotland',
         'Harvest lower leaves first',
-        'Net against pigeons and cabbage whites'
+        'Net against pigeons'
       ]
     },
     companionPlants: ['Beetroot', 'Celery', 'Onions', 'Potatoes'],
@@ -93,12 +120,12 @@ export const vegetables: Vegetable[] = [
     id: 'chard',
     name: 'Swiss Chard',
     category: 'leafy-greens',
-    description: 'Colorful, productive leafy green with edible stems.',
+    description: 'Colorful, productive leafy green with edible stems. Hardy in mild winters.',
     planting: {
-      sowIndoorsMonths: [3, 4],
-      sowOutdoorsMonths: [4, 5, 6, 7],
-      transplantMonths: [5, 6],
-      harvestMonths: [6, 7, 8, 9, 10, 11],
+      sowIndoorsMonths: [4, 5],
+      sowOutdoorsMonths: [5, 6, 7],
+      transplantMonths: [6, 7],
+      harvestMonths: [7, 8, 9, 10, 11],
       daysToHarvest: { min: 50, max: 60 }
     },
     care: {
@@ -109,8 +136,8 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Cut-and-come-again harvesting',
-        'Tolerates heat better than spinach',
-        'Rainbow varieties are ornamental'
+        'Rainbow varieties brighten Scottish gardens',
+        'May overwinter in sheltered spots'
       ]
     },
     companionPlants: ['Beans', 'Brassicas', 'Onions'],
@@ -120,12 +147,12 @@ export const vegetables: Vegetable[] = [
     id: 'rocket',
     name: 'Rocket (Arugula)',
     category: 'leafy-greens',
-    description: 'Peppery salad leaf that grows quickly and easily.',
+    description: 'Peppery salad leaf that grows quickly. Less likely to bolt in Scotland.',
     planting: {
-      sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7, 8, 9],
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [5, 6, 7, 8, 9],
       transplantMonths: [],
-      harvestMonths: [4, 5, 6, 7, 8, 9, 10],
+      harvestMonths: [5, 6, 7, 8, 9, 10],
       daysToHarvest: { min: 21, max: 40 }
     },
     care: {
@@ -135,12 +162,66 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'beginner',
       tips: [
-        'Fast to bolt in heat',
-        'Sow every 2-3 weeks for continuous harvest',
+        'Wild rocket is hardier than salad rocket',
+        'Sow every 3 weeks for continuous harvest',
         'Pick leaves young for milder flavor'
       ]
     },
     companionPlants: ['Bush beans', 'Beets', 'Carrots', 'Lettuce'],
+    avoidPlants: []
+  },
+  {
+    id: 'claytonia',
+    name: 'Claytonia (Miners Lettuce)',
+    category: 'leafy-greens',
+    description: 'Hardy winter salad leaf, perfect for Scottish conditions.',
+    planting: {
+      sowIndoorsMonths: [],
+      sowOutdoorsMonths: [3, 4, 8, 9],
+      transplantMonths: [],
+      harvestMonths: [10, 11, 12, 1, 2, 3, 4, 5],
+      daysToHarvest: { min: 40, max: 60 }
+    },
+    care: {
+      sun: 'partial-shade',
+      water: 'moderate',
+      spacing: { between: 15, rows: 20 },
+      depth: 1,
+      difficulty: 'beginner',
+      tips: [
+        'One of the hardiest winter salads',
+        'Self-seeds freely once established',
+        'Excellent for shady spots'
+      ]
+    },
+    companionPlants: ['Lettuce', 'Spinach'],
+    avoidPlants: []
+  },
+  {
+    id: 'land-cress',
+    name: 'Land Cress',
+    category: 'leafy-greens',
+    description: 'Peppery like watercress but grows in soil. Very hardy.',
+    planting: {
+      sowIndoorsMonths: [],
+      sowOutdoorsMonths: [3, 4, 5, 8, 9],
+      transplantMonths: [],
+      harvestMonths: [5, 6, 10, 11, 12, 1, 2, 3],
+      daysToHarvest: { min: 50, max: 70 }
+    },
+    care: {
+      sun: 'partial-shade',
+      water: 'high',
+      spacing: { between: 15, rows: 20 },
+      depth: 1,
+      difficulty: 'beginner',
+      tips: [
+        'Tastes like watercress without needing water',
+        'Thrives in cooler Scottish temperatures',
+        'Harvest outer leaves regularly'
+      ]
+    },
+    companionPlants: ['Lettuce', 'Radishes'],
     avoidPlants: []
   },
 
@@ -149,12 +230,12 @@ export const vegetables: Vegetable[] = [
     id: 'carrots',
     name: 'Carrots',
     category: 'root-vegetables',
-    description: 'Sweet root vegetable available in many colors. Prefers loose, stone-free soil.',
+    description: 'Sweet root vegetable. Sow later in Scotland after soil warms.',
     planting: {
       sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7],
+      sowOutdoorsMonths: [4, 5, 6, 7],
       transplantMonths: [],
-      harvestMonths: [6, 7, 8, 9, 10, 11, 12],
+      harvestMonths: [7, 8, 9, 10, 11, 12],
       daysToHarvest: { min: 70, max: 80 }
     },
     care: {
@@ -164,9 +245,9 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Thin seedlings for larger roots',
-        'Sow thinly to reduce thinning',
-        'Cover with fleece against carrot fly'
+        'Wait until soil warms to 7°C',
+        'Cover with fleece against carrot fly',
+        'Can leave in ground and harvest through winter'
       ]
     },
     companionPlants: ['Onions', 'Leeks', 'Rosemary', 'Sage'],
@@ -174,14 +255,14 @@ export const vegetables: Vegetable[] = [
   },
   {
     id: 'potatoes',
-    name: 'Potatoes',
+    name: 'Potatoes (Tatties)',
     category: 'root-vegetables',
-    description: 'Staple crop with early, second early, and maincrop varieties.',
+    description: 'Scottish staple! Plant after last frost risk around late April.',
     planting: {
       sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5],
+      sowOutdoorsMonths: [4, 5],
       transplantMonths: [],
-      harvestMonths: [6, 7, 8, 9, 10],
+      harvestMonths: [7, 8, 9, 10],
       daysToHarvest: { min: 70, max: 140 }
     },
     care: {
@@ -191,24 +272,24 @@ export const vegetables: Vegetable[] = [
       depth: 15,
       difficulty: 'beginner',
       tips: [
-        'Chit seed potatoes before planting',
-        'Earth up as plants grow',
-        'Watch for blight in wet summers'
+        'Chit from February in a cool light place',
+        'Plant after last frost (late April in Edinburgh)',
+        'Watch for blight - common in wet Scottish summers'
       ]
     },
-    companionPlants: ['Beans', 'Cabbage', 'Corn', 'Horseradish'],
+    companionPlants: ['Beans', 'Cabbage', 'Horseradish'],
     avoidPlants: ['Tomatoes', 'Cucumbers', 'Squash']
   },
   {
     id: 'beetroot',
     name: 'Beetroot',
     category: 'root-vegetables',
-    description: 'Versatile root vegetable with edible leaves. Easy to grow.',
+    description: 'Versatile root vegetable. Wait for warmer soil in Scotland.',
     planting: {
-      sowIndoorsMonths: [3, 4],
-      sowOutdoorsMonths: [4, 5, 6, 7],
+      sowIndoorsMonths: [4, 5],
+      sowOutdoorsMonths: [5, 6, 7],
       transplantMonths: [5, 6],
-      harvestMonths: [6, 7, 8, 9, 10, 11],
+      harvestMonths: [7, 8, 9, 10, 11],
       daysToHarvest: { min: 50, max: 70 }
     },
     care: {
@@ -219,7 +300,7 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Soak seeds before sowing',
-        'Each seed cluster produces multiple plants',
+        'Bolt-resistant varieties best for Scotland',
         'Harvest young for tender roots'
       ]
     },
@@ -230,7 +311,7 @@ export const vegetables: Vegetable[] = [
     id: 'parsnips',
     name: 'Parsnips',
     category: 'root-vegetables',
-    description: 'Sweet winter root vegetable. Frost improves flavor.',
+    description: 'Sweet winter root. Frost improves flavor - perfect for Scotland!',
     planting: {
       sowIndoorsMonths: [],
       sowOutdoorsMonths: [3, 4, 5],
@@ -245,24 +326,78 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Use fresh seed each year',
-        'Slow to germinate - be patient',
-        'Leave in ground until after frost'
+        'Use fresh seed each year - viability drops fast',
+        'Be patient - can take 4 weeks to germinate',
+        'Leave in ground until after frost for sweetest flavor'
       ]
     },
     companionPlants: ['Onions', 'Garlic', 'Radishes'],
     avoidPlants: ['Carrots', 'Celery']
   },
   {
+    id: 'swede',
+    name: 'Swede (Neeps)',
+    category: 'root-vegetables',
+    description: 'Essential for Burns Night! Hardy Scottish favorite that loves cool weather.',
+    planting: {
+      sowIndoorsMonths: [],
+      sowOutdoorsMonths: [5, 6],
+      transplantMonths: [],
+      harvestMonths: [10, 11, 12, 1, 2, 3],
+      daysToHarvest: { min: 90, max: 120 }
+    },
+    care: {
+      sun: 'full-sun',
+      water: 'moderate',
+      spacing: { between: 23, rows: 38 },
+      depth: 2,
+      difficulty: 'beginner',
+      tips: [
+        'Essential for Burns Night neeps & tatties!',
+        'Frost sweetens the roots',
+        'Can leave in ground all winter'
+      ]
+    },
+    companionPlants: ['Peas', 'Beans', 'Onions'],
+    avoidPlants: ['Potatoes', 'Other brassicas nearby']
+  },
+  {
+    id: 'turnips',
+    name: 'Turnips',
+    category: 'root-vegetables',
+    description: 'Fast-growing root with edible greens. Best harvested young.',
+    planting: {
+      sowIndoorsMonths: [],
+      sowOutdoorsMonths: [4, 5, 7, 8],
+      transplantMonths: [],
+      harvestMonths: [6, 7, 8, 10, 11],
+      daysToHarvest: { min: 40, max: 60 }
+    },
+    care: {
+      sun: 'full-sun',
+      water: 'moderate',
+      spacing: { between: 15, rows: 30 },
+      depth: 1,
+      difficulty: 'beginner',
+      tips: [
+        'Harvest when golf ball sized',
+        'Young leaves are edible (turnip tops)',
+        'Quick maturing varieties best for short season'
+      ]
+    },
+    companionPlants: ['Peas', 'Beans'],
+    avoidPlants: ['Potatoes']
+  },
+  {
     id: 'radishes',
     name: 'Radishes',
     category: 'root-vegetables',
-    description: 'Quick-growing root crop ideal for beginners and intercropping.',
+    description: 'Quick-growing root crop. Ready in weeks - ideal for Scottish summer.',
     planting: {
       sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7, 8, 9],
+      sowOutdoorsMonths: [4, 5, 6, 7, 8, 9],
       transplantMonths: [],
-      harvestMonths: [4, 5, 6, 7, 8, 9, 10],
+      harvestMonths: [5, 6, 7, 8, 9, 10],
       daysToHarvest: { min: 25, max: 35 }
     },
     care: {
@@ -274,38 +409,38 @@ export const vegetables: Vegetable[] = [
       tips: [
         'Harvest promptly to avoid woodiness',
         'Great for intercropping',
-        'Sow little and often'
+        'Less likely to bolt in cool Scottish weather'
       ]
     },
     companionPlants: ['Carrots', 'Lettuce', 'Peas', 'Spinach'],
     avoidPlants: ['Hyssop']
   },
   {
-    id: 'turnips',
-    name: 'Turnips',
+    id: 'salsify',
+    name: 'Salsify',
     category: 'root-vegetables',
-    description: 'Fast-growing root with edible greens. Best harvested young.',
+    description: 'Oyster-flavored root vegetable. Hardy and underrated!',
     planting: {
       sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5, 7, 8],
+      sowOutdoorsMonths: [4, 5],
       transplantMonths: [],
-      harvestMonths: [5, 6, 7, 9, 10, 11],
-      daysToHarvest: { min: 40, max: 60 }
+      harvestMonths: [10, 11, 12, 1, 2, 3],
+      daysToHarvest: { min: 120, max: 150 }
     },
     care: {
       sun: 'full-sun',
       water: 'moderate',
-      spacing: { between: 15, rows: 30 },
+      spacing: { between: 10, rows: 30 },
       depth: 1,
-      difficulty: 'beginner',
+      difficulty: 'intermediate',
       tips: [
-        'Harvest when golf ball sized',
-        'Young leaves are edible',
-        'Fast summer varieties available'
+        'Subtle oyster-like flavor',
+        'Frost improves flavor',
+        'Leave in ground through winter'
       ]
     },
-    companionPlants: ['Peas', 'Beans'],
-    avoidPlants: ['Potatoes']
+    companionPlants: ['Carrots', 'Onions'],
+    avoidPlants: []
   },
 
   // ============ BRASSICAS ============
@@ -313,12 +448,12 @@ export const vegetables: Vegetable[] = [
     id: 'cabbage',
     name: 'Cabbage',
     category: 'brassicas',
-    description: 'Classic vegetable with spring, summer, autumn and winter varieties.',
+    description: 'Classic vegetable. Spring and winter varieties excellent for Scotland.',
     planting: {
-      sowIndoorsMonths: [2, 3, 4, 5],
-      sowOutdoorsMonths: [4, 5],
-      transplantMonths: [4, 5, 6, 7],
-      harvestMonths: [6, 7, 8, 9, 10, 11, 12, 1, 2, 3],
+      sowIndoorsMonths: [3, 4, 5],
+      sowOutdoorsMonths: [5, 6],
+      transplantMonths: [5, 6, 7],
+      harvestMonths: [7, 8, 9, 10, 11, 12, 1, 2, 3],
       daysToHarvest: { min: 70, max: 120 }
     },
     care: {
@@ -328,7 +463,7 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Net against pigeons and butterflies',
+        'Net against pigeons - they love it!',
         'Firm soil well when transplanting',
         'Collar against cabbage root fly'
       ]
@@ -338,14 +473,14 @@ export const vegetables: Vegetable[] = [
   },
   {
     id: 'broccoli',
-    name: 'Broccoli',
+    name: 'Calabrese (Broccoli)',
     category: 'brassicas',
-    description: 'Nutritious vegetable producing multiple side shoots after main head.',
+    description: 'Quick maturing broccoli. Start indoors for best results in Scotland.',
     planting: {
-      sowIndoorsMonths: [3, 4, 5],
+      sowIndoorsMonths: [4, 5],
       sowOutdoorsMonths: [],
       transplantMonths: [5, 6, 7],
-      harvestMonths: [7, 8, 9, 10, 11],
+      harvestMonths: [7, 8, 9, 10],
       daysToHarvest: { min: 60, max: 90 }
     },
     care: {
@@ -355,24 +490,51 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Harvest before flowers open',
+        'Start early indoors for longer season',
         'Cut main head to encourage side shoots',
-        'Net against pests'
+        'Net against cabbage white butterflies'
       ]
     },
     companionPlants: ['Beetroot', 'Celery', 'Onions', 'Potatoes'],
     avoidPlants: ['Strawberries', 'Tomatoes']
   },
   {
+    id: 'purple-sprouting-broccoli',
+    name: 'Purple Sprouting Broccoli',
+    category: 'brassicas',
+    description: 'Hardy winter broccoli - harvests when little else is available!',
+    planting: {
+      sowIndoorsMonths: [4, 5],
+      sowOutdoorsMonths: [5],
+      transplantMonths: [6, 7],
+      harvestMonths: [2, 3, 4, 5],
+      daysToHarvest: { min: 220, max: 280 }
+    },
+    care: {
+      sun: 'full-sun',
+      water: 'moderate',
+      spacing: { between: 60, rows: 75 },
+      depth: 1,
+      difficulty: 'intermediate',
+      tips: [
+        'Perfect for hungry gap (Feb-April)',
+        'Very hardy - survives Scottish winters',
+        'Stake plants as they get tall'
+      ]
+    },
+    companionPlants: ['Beetroot', 'Onions', 'Potatoes'],
+    avoidPlants: ['Strawberries', 'Tomatoes']
+  },
+  {
     id: 'cauliflower',
     name: 'Cauliflower',
     category: 'brassicas',
-    description: 'Demanding but rewarding crop with beautiful white curds.',
+    description: 'Demanding but rewarding. Choose varieties suited to Scotland.',
     planting: {
-      sowIndoorsMonths: [1, 2, 3, 4, 5],
+      sowIndoorsMonths: [2, 3, 4, 5],
       sowOutdoorsMonths: [],
-      transplantMonths: [4, 5, 6, 7],
-      harvestMonths: [6, 7, 8, 9, 10, 11],
+      transplantMonths: [5, 6, 7],
+      harvestMonths: [7, 8, 9, 10, 11],
       daysToHarvest: { min: 80, max: 120 }
     },
     care: {
@@ -382,9 +544,9 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'advanced',
       tips: [
-        'Keep consistently watered',
+        'Consistent watering crucial',
         'Bend leaves over curd to protect',
-        'Needs rich, firm soil'
+        'Autumn/winter varieties more reliable in Scotland'
       ]
     },
     companionPlants: ['Beetroot', 'Celery', 'Beans'],
@@ -394,9 +556,9 @@ export const vegetables: Vegetable[] = [
     id: 'brussels-sprouts',
     name: 'Brussels Sprouts',
     category: 'brassicas',
-    description: 'Winter staple that improves after frost. Long growing season.',
+    description: 'Christmas dinner essential! Improves after frost.',
     planting: {
-      sowIndoorsMonths: [2, 3, 4],
+      sowIndoorsMonths: [3, 4],
       sowOutdoorsMonths: [],
       transplantMonths: [5, 6],
       harvestMonths: [10, 11, 12, 1, 2, 3],
@@ -409,8 +571,8 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Stake tall plants',
-        'Remove yellowing lower leaves',
+        'Frost sweetens the sprouts',
+        'Stake tall plants against Scottish winds',
         'Harvest from bottom up'
       ]
     },
@@ -423,12 +585,12 @@ export const vegetables: Vegetable[] = [
     id: 'runner-beans',
     name: 'Runner Beans',
     category: 'legumes',
-    description: 'Prolific climbing bean. Traditional British favorite.',
+    description: 'Prolific climbing bean. Wait until after last frost in late May.',
     planting: {
-      sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9, 10],
+      sowIndoorsMonths: [5],
+      sowOutdoorsMonths: [6],
+      transplantMonths: [6],
+      harvestMonths: [8, 9, 10],
       daysToHarvest: { min: 60, max: 75 }
     },
     care: {
@@ -438,24 +600,24 @@ export const vegetables: Vegetable[] = [
       depth: 5,
       difficulty: 'beginner',
       tips: [
-        'Need sturdy supports',
-        'Pick regularly for more beans',
-        'Water well especially when flowering'
+        'Frost tender - wait until June to plant out',
+        'Need sturdy supports for Scottish winds',
+        'Pick regularly for more beans'
       ]
     },
-    companionPlants: ['Carrots', 'Corn', 'Squash', 'Cabbage'],
+    companionPlants: ['Carrots', 'Squash', 'Cabbage'],
     avoidPlants: ['Onions', 'Garlic', 'Fennel']
   },
   {
     id: 'french-beans',
     name: 'French Beans',
     category: 'legumes',
-    description: 'Bush or climbing beans with tender pods. Easy to grow.',
+    description: 'Bush or climbing beans. Start indoors in Scotland.',
     planting: {
-      sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6, 7],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9, 10],
+      sowIndoorsMonths: [5],
+      sowOutdoorsMonths: [6],
+      transplantMonths: [6],
+      harvestMonths: [8, 9, 10],
       daysToHarvest: { min: 55, max: 65 }
     },
     care: {
@@ -466,23 +628,23 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Bush varieties need no support',
-        'Harvest when pencil thin',
-        'Sow successionally for longer harvest'
+        'Start indoors for longer harvest window',
+        'Harvest when pencil thin'
       ]
     },
-    companionPlants: ['Carrots', 'Corn', 'Cucumber', 'Cabbage'],
+    companionPlants: ['Carrots', 'Cucumber', 'Cabbage'],
     avoidPlants: ['Onions', 'Garlic']
   },
   {
     id: 'broad-beans',
     name: 'Broad Beans',
     category: 'legumes',
-    description: 'Hardy beans that can be autumn or spring sown.',
+    description: 'Hardy beans - can be autumn sown in Scotland for early crop!',
     planting: {
       sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [2, 3, 4, 10, 11],
+      sowOutdoorsMonths: [3, 4, 10, 11],
       transplantMonths: [],
-      harvestMonths: [5, 6, 7, 8],
+      harvestMonths: [6, 7, 8],
       daysToHarvest: { min: 80, max: 100 }
     },
     care: {
@@ -492,9 +654,9 @@ export const vegetables: Vegetable[] = [
       depth: 5,
       difficulty: 'beginner',
       tips: [
-        'Pinch out tips when first pods form',
-        'Support tall varieties',
-        'Watch for blackfly on tips'
+        'Autumn sowing gives earlier crop',
+        'Very hardy - survives Scottish winters',
+        'Pinch out tips when first pods form'
       ]
     },
     companionPlants: ['Brassicas', 'Carrots', 'Celery', 'Potatoes'],
@@ -504,11 +666,11 @@ export const vegetables: Vegetable[] = [
     id: 'peas',
     name: 'Peas',
     category: 'legumes',
-    description: 'Sweet garden peas including mange tout and sugar snap varieties.',
+    description: 'Sweet garden peas. Cool Scottish summer is perfect for them!',
     planting: {
-      sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7],
-      transplantMonths: [4, 5],
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [4, 5, 6],
+      transplantMonths: [5, 6],
       harvestMonths: [6, 7, 8, 9],
       daysToHarvest: { min: 60, max: 80 }
     },
@@ -519,12 +681,12 @@ export const vegetables: Vegetable[] = [
       depth: 5,
       difficulty: 'beginner',
       tips: [
-        'Provide support for climbing',
+        'Peas love Scottish weather!',
         'Sow in guttering for easy planting out',
-        'Mulch to keep roots cool'
+        'Provide support for climbing'
       ]
     },
-    companionPlants: ['Carrots', 'Radishes', 'Turnips', 'Corn'],
+    companionPlants: ['Carrots', 'Radishes', 'Turnips'],
     avoidPlants: ['Onions', 'Garlic']
   },
 
@@ -533,12 +695,12 @@ export const vegetables: Vegetable[] = [
     id: 'tomatoes',
     name: 'Tomatoes',
     category: 'solanaceae',
-    description: 'Popular summer crop with hundreds of varieties. Bush or cordon types.',
+    description: 'Best under cover in Scotland. Choose blight-resistant varieties.',
     planting: {
-      sowIndoorsMonths: [2, 3, 4],
+      sowIndoorsMonths: [3, 4],
       sowOutdoorsMonths: [],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9, 10],
+      transplantMonths: [6],
+      harvestMonths: [8, 9, 10],
       daysToHarvest: { min: 60, max: 85 }
     },
     care: {
@@ -548,24 +710,24 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Remove side shoots on cordon types',
-        'Feed weekly when fruiting',
-        'Water consistently to prevent splitting'
+        'Greenhouse or polytunnel recommended',
+        'Choose blight-resistant varieties for outdoors',
+        'Outdoor bush varieties like Tumbler can work'
       ]
     },
-    companionPlants: ['Basil', 'Carrots', 'Marigolds', 'Peppers'],
-    avoidPlants: ['Fennel', 'Brassicas', 'Corn']
+    companionPlants: ['Basil', 'Carrots', 'Marigolds'],
+    avoidPlants: ['Fennel', 'Brassicas']
   },
   {
     id: 'peppers',
     name: 'Sweet Peppers',
     category: 'solanaceae',
-    description: 'Colorful bell peppers. Best grown under cover in cooler climates.',
+    description: 'Colorful bell peppers. Need greenhouse in Scotland.',
     planting: {
       sowIndoorsMonths: [2, 3],
       sowOutdoorsMonths: [],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9, 10],
+      transplantMonths: [6],
+      harvestMonths: [8, 9, 10],
       daysToHarvest: { min: 60, max: 90 }
     },
     care: {
@@ -575,24 +737,24 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Start early indoors',
-        'Best in greenhouse or polytunnel',
-        'Pinch growing tip at 30cm for bushier plants'
+        'Greenhouse essential in Scotland',
+        'Start very early indoors',
+        'Pinch growing tip for bushier plants'
       ]
     },
-    companionPlants: ['Tomatoes', 'Basil', 'Carrots', 'Onions'],
+    companionPlants: ['Tomatoes', 'Basil', 'Carrots'],
     avoidPlants: ['Fennel', 'Beans']
   },
   {
     id: 'chillies',
     name: 'Chillies',
     category: 'solanaceae',
-    description: 'Hot peppers in various heat levels. Excellent container plants.',
+    description: 'Hot peppers. Grow in pots on sunny windowsill or greenhouse.',
     planting: {
       sowIndoorsMonths: [1, 2, 3],
       sowOutdoorsMonths: [],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9, 10],
+      transplantMonths: [6],
+      harvestMonths: [8, 9, 10],
       daysToHarvest: { min: 70, max: 120 }
     },
     care: {
@@ -602,39 +764,12 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'intermediate',
       tips: [
-        'Need long growing season - start early',
-        'Great for pots and containers',
-        'Dry or freeze excess harvest'
+        'Start very early (January) for Scotland',
+        'Windowsill or greenhouse growing',
+        'Smaller varieties work well in pots'
       ]
     },
     companionPlants: ['Tomatoes', 'Basil', 'Carrots'],
-    avoidPlants: ['Fennel']
-  },
-  {
-    id: 'aubergine',
-    name: 'Aubergine (Eggplant)',
-    category: 'solanaceae',
-    description: 'Glossy purple fruits. Needs warmth and long growing season.',
-    planting: {
-      sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [],
-      transplantMonths: [5, 6],
-      harvestMonths: [7, 8, 9],
-      daysToHarvest: { min: 80, max: 100 }
-    },
-    care: {
-      sun: 'full-sun',
-      water: 'moderate',
-      spacing: { between: 60, rows: 60 },
-      depth: 1,
-      difficulty: 'advanced',
-      tips: [
-        'Best under cover',
-        'Limit to 4-5 fruits per plant',
-        'Stake plants when fruiting'
-      ]
-    },
-    companionPlants: ['Peppers', 'Tomatoes', 'Beans'],
     avoidPlants: ['Fennel']
   },
 
@@ -643,11 +778,11 @@ export const vegetables: Vegetable[] = [
     id: 'courgettes',
     name: 'Courgettes (Zucchini)',
     category: 'cucurbits',
-    description: 'Prolific summer squash. Pick regularly for best yields.',
+    description: 'Prolific summer squash. Start indoors and plant out after frost.',
     planting: {
       sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
+      sowOutdoorsMonths: [],
+      transplantMonths: [6],
       harvestMonths: [7, 8, 9, 10],
       daysToHarvest: { min: 45, max: 60 }
     },
@@ -658,23 +793,23 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'beginner',
       tips: [
+        'Frost tender - harden off well',
         'Pick when 10-15cm long',
-        'One or two plants is enough',
-        'Remove lower leaves for air circulation'
+        'One or two plants is enough!'
       ]
     },
-    companionPlants: ['Beans', 'Corn', 'Nasturtiums', 'Radishes'],
+    companionPlants: ['Beans', 'Nasturtiums', 'Radishes'],
     avoidPlants: ['Potatoes']
   },
   {
     id: 'cucumber',
     name: 'Cucumber',
     category: 'cucurbits',
-    description: 'Climbing or trailing vine. Indoor and outdoor varieties available.',
+    description: 'Best under cover in Scotland. Ridge cucumbers hardier outdoors.',
     planting: {
       sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
+      sowOutdoorsMonths: [],
+      transplantMonths: [6],
       harvestMonths: [7, 8, 9],
       daysToHarvest: { min: 50, max: 70 }
     },
@@ -685,23 +820,23 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'intermediate',
       tips: [
-        'Keep consistently watered',
-        'Train up supports',
-        'Pick regularly to encourage more fruits'
+        'Greenhouse cucumbers give best results',
+        'Ridge types can grow outdoors with protection',
+        'Keep consistently watered'
       ]
     },
-    companionPlants: ['Beans', 'Corn', 'Peas', 'Radishes'],
+    companionPlants: ['Beans', 'Peas', 'Radishes'],
     avoidPlants: ['Potatoes', 'Aromatic herbs']
   },
   {
     id: 'squash',
     name: 'Winter Squash',
     category: 'cucurbits',
-    description: 'Includes butternut, crown prince, and more. Stores well.',
+    description: 'Includes butternut, crown prince. Start indoors for Scotland.',
     planting: {
       sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
+      sowOutdoorsMonths: [],
+      transplantMonths: [6],
       harvestMonths: [9, 10],
       daysToHarvest: { min: 85, max: 110 }
     },
@@ -712,23 +847,23 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'beginner',
       tips: [
-        'Needs space to sprawl',
-        'Cure in sun before storing',
-        'Limit fruits for larger squash'
+        'Choose shorter-season varieties (Crown Prince)',
+        'Harden off well before planting out',
+        'Cure in any late sunshine before storing'
       ]
     },
-    companionPlants: ['Beans', 'Corn', 'Nasturtiums'],
+    companionPlants: ['Beans', 'Nasturtiums'],
     avoidPlants: ['Potatoes']
   },
   {
     id: 'pumpkin',
     name: 'Pumpkin',
     category: 'cucurbits',
-    description: 'Traditional autumn favourite. Various sizes available.',
+    description: 'Traditional autumn favourite. Need warm start indoors.',
     planting: {
       sowIndoorsMonths: [4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
+      sowOutdoorsMonths: [],
+      transplantMonths: [6],
       harvestMonths: [9, 10],
       daysToHarvest: { min: 90, max: 120 }
     },
@@ -739,12 +874,12 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'beginner',
       tips: [
-        'Very space hungry',
-        'Place boards under fruits',
+        'Choose smaller varieties for reliability',
+        'Need sheltered sunny spot',
         'Cut with stem attached for storage'
       ]
     },
-    companionPlants: ['Corn', 'Beans', 'Nasturtiums'],
+    companionPlants: ['Beans', 'Nasturtiums'],
     avoidPlants: ['Potatoes']
   },
 
@@ -753,12 +888,12 @@ export const vegetables: Vegetable[] = [
     id: 'onions',
     name: 'Onions',
     category: 'alliums',
-    description: 'Kitchen essential grown from sets or seed. Many varieties.',
+    description: 'Kitchen essential. Sets easier than seed in Scotland.',
     planting: {
-      sowIndoorsMonths: [1, 2],
-      sowOutdoorsMonths: [3, 4],
-      transplantMonths: [3, 4],
-      harvestMonths: [7, 8, 9],
+      sowIndoorsMonths: [2, 3],
+      sowOutdoorsMonths: [4],
+      transplantMonths: [4, 5],
+      harvestMonths: [8, 9],
       daysToHarvest: { min: 100, max: 175 }
     },
     care: {
@@ -768,24 +903,24 @@ export const vegetables: Vegetable[] = [
       depth: 2,
       difficulty: 'beginner',
       tips: [
-        'Sets are easier than seed',
-        'Stop watering when leaves fall over',
-        'Cure in sun before storing'
+        'Sets are more reliable than seed in Scotland',
+        'Japanese sets can be autumn planted',
+        'Cure well in any dry weather'
       ]
     },
-    companionPlants: ['Carrots', 'Beetroot', 'Lettuce', 'Tomatoes'],
+    companionPlants: ['Carrots', 'Beetroot', 'Lettuce'],
     avoidPlants: ['Beans', 'Peas']
   },
   {
     id: 'garlic',
     name: 'Garlic',
     category: 'alliums',
-    description: 'Plant in autumn for summer harvest. Easy and rewarding.',
+    description: 'Plant in autumn for best bulbs. Needs cold period.',
     planting: {
       sowIndoorsMonths: [],
       sowOutdoorsMonths: [10, 11, 2, 3],
       transplantMonths: [],
-      harvestMonths: [6, 7, 8],
+      harvestMonths: [7, 8],
       daysToHarvest: { min: 180, max: 270 }
     },
     care: {
@@ -795,9 +930,9 @@ export const vegetables: Vegetable[] = [
       depth: 5,
       difficulty: 'beginner',
       tips: [
-        'Autumn planting gives bigger bulbs',
-        'Remove flower stalks (scapes)',
-        'Harvest when lower leaves yellow'
+        'Autumn planting essential for best bulbs',
+        'Scottish winters provide needed cold',
+        'Hardneck varieties most reliable'
       ]
     },
     companionPlants: ['Roses', 'Tomatoes', 'Beetroot'],
@@ -807,12 +942,12 @@ export const vegetables: Vegetable[] = [
     id: 'leeks',
     name: 'Leeks',
     category: 'alliums',
-    description: 'Hardy winter vegetable. Mild onion flavor.',
+    description: 'Hardy winter vegetable. Excellent for Scottish gardens!',
     planting: {
-      sowIndoorsMonths: [2, 3],
-      sowOutdoorsMonths: [3, 4],
-      transplantMonths: [5, 6, 7],
-      harvestMonths: [9, 10, 11, 12, 1, 2, 3, 4],
+      sowIndoorsMonths: [2, 3, 4],
+      sowOutdoorsMonths: [4, 5],
+      transplantMonths: [6, 7],
+      harvestMonths: [10, 11, 12, 1, 2, 3, 4],
       daysToHarvest: { min: 120, max: 150 }
     },
     care: {
@@ -822,9 +957,9 @@ export const vegetables: Vegetable[] = [
       depth: 15,
       difficulty: 'beginner',
       tips: [
-        'Plant in deep holes for blanched stems',
-        'Earth up as they grow',
-        'Harvest as needed through winter'
+        'Drop seedlings in deep holes for blanched stems',
+        'Very hardy - harvest all winter',
+        'Musselburgh variety bred for Scottish climate!'
       ]
     },
     companionPlants: ['Carrots', 'Celery', 'Onions'],
@@ -836,10 +971,10 @@ export const vegetables: Vegetable[] = [
     category: 'alliums',
     description: 'Quick-growing salad onion. Sow successionally.',
     planting: {
-      sowIndoorsMonths: [],
-      sowOutdoorsMonths: [3, 4, 5, 6, 7, 8],
+      sowIndoorsMonths: [3],
+      sowOutdoorsMonths: [4, 5, 6, 7, 8],
       transplantMonths: [],
-      harvestMonths: [5, 6, 7, 8, 9, 10],
+      harvestMonths: [6, 7, 8, 9, 10],
       daysToHarvest: { min: 60, max: 80 }
     },
     care: {
@@ -849,12 +984,12 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'beginner',
       tips: [
-        'Sow every 2-3 weeks',
+        'Sow every 3 weeks for continuous harvest',
         'Can be grown in containers',
-        'Harvest when pencil thickness'
+        'White Lisbon is reliable for Scotland'
       ]
     },
-    companionPlants: ['Carrots', 'Lettuce', 'Tomatoes'],
+    companionPlants: ['Carrots', 'Lettuce'],
     avoidPlants: ['Beans', 'Peas']
   },
 
@@ -863,12 +998,12 @@ export const vegetables: Vegetable[] = [
     id: 'basil',
     name: 'Basil',
     category: 'herbs',
-    description: 'Aromatic herb essential for Mediterranean cooking. Frost tender.',
+    description: 'Frost tender herb. Best on sunny windowsill or greenhouse.',
     planting: {
-      sowIndoorsMonths: [3, 4, 5],
-      sowOutdoorsMonths: [5, 6],
-      transplantMonths: [5, 6],
-      harvestMonths: [6, 7, 8, 9],
+      sowIndoorsMonths: [4, 5],
+      sowOutdoorsMonths: [],
+      transplantMonths: [6],
+      harvestMonths: [7, 8, 9],
       daysToHarvest: { min: 40, max: 60 }
     },
     care: {
@@ -878,9 +1013,9 @@ export const vegetables: Vegetable[] = [
       depth: 0.5,
       difficulty: 'beginner',
       tips: [
+        'Grow indoors on sunny windowsill',
         'Pinch out flower heads',
-        'Water from below to prevent disease',
-        'Harvest from the top down'
+        'Protect from any cold'
       ]
     },
     companionPlants: ['Tomatoes', 'Peppers', 'Oregano'],
@@ -890,12 +1025,12 @@ export const vegetables: Vegetable[] = [
     id: 'parsley',
     name: 'Parsley',
     category: 'herbs',
-    description: 'Versatile herb for cooking. Flat-leaf and curly varieties.',
+    description: 'Versatile hardy herb. Survives Scottish winters.',
     planting: {
       sowIndoorsMonths: [3, 4],
-      sowOutdoorsMonths: [4, 5, 6, 7],
+      sowOutdoorsMonths: [5, 6, 7],
       transplantMonths: [5, 6],
-      harvestMonths: [5, 6, 7, 8, 9, 10, 11],
+      harvestMonths: [6, 7, 8, 9, 10, 11, 12],
       daysToHarvest: { min: 70, max: 90 }
     },
     care: {
@@ -906,7 +1041,7 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Slow to germinate - be patient',
-        'Soak seeds overnight before sowing',
+        'Can survive mild Scottish winters',
         'Cut outer stems first'
       ]
     },
@@ -917,12 +1052,12 @@ export const vegetables: Vegetable[] = [
     id: 'coriander',
     name: 'Coriander (Cilantro)',
     category: 'herbs',
-    description: 'Fast-growing herb that bolts quickly in heat. Seeds also useful.',
+    description: 'Fast-growing herb. Less prone to bolting in Scottish climate!',
     planting: {
-      sowIndoorsMonths: [3, 4],
-      sowOutdoorsMonths: [4, 5, 6, 7, 8],
+      sowIndoorsMonths: [4],
+      sowOutdoorsMonths: [5, 6, 7, 8],
       transplantMonths: [],
-      harvestMonths: [5, 6, 7, 8, 9, 10],
+      harvestMonths: [6, 7, 8, 9, 10],
       daysToHarvest: { min: 40, max: 60 }
     },
     care: {
@@ -932,8 +1067,8 @@ export const vegetables: Vegetable[] = [
       depth: 1,
       difficulty: 'beginner',
       tips: [
-        'Bolts quickly in hot weather',
-        'Sow every 2-3 weeks',
+        'Cooler Scottish weather reduces bolting',
+        'Sow every 3 weeks for continuous supply',
         'Let some plants set seed for coriander seeds'
       ]
     },
@@ -944,11 +1079,11 @@ export const vegetables: Vegetable[] = [
     id: 'mint',
     name: 'Mint',
     category: 'herbs',
-    description: 'Vigorous perennial herb. Best grown in containers to contain spread.',
+    description: 'Vigorous perennial herb. Very hardy - thrives in Scotland!',
     planting: {
       sowIndoorsMonths: [3, 4],
-      sowOutdoorsMonths: [4, 5],
-      transplantMonths: [4, 5, 6],
+      sowOutdoorsMonths: [5, 6],
+      transplantMonths: [5, 6, 7],
       harvestMonths: [5, 6, 7, 8, 9, 10],
       daysToHarvest: { min: 60, max: 90 }
     },
@@ -959,8 +1094,8 @@ export const vegetables: Vegetable[] = [
       depth: 0.5,
       difficulty: 'beginner',
       tips: [
-        'Contains invasive roots',
-        'Best grown in pots sunk into ground',
+        'Extremely hardy - loves Scotland',
+        'Contain in pots - very invasive',
         'Cut back after flowering'
       ]
     },
@@ -968,14 +1103,41 @@ export const vegetables: Vegetable[] = [
     avoidPlants: ['Chamomile', 'Parsley']
   },
   {
+    id: 'chives',
+    name: 'Chives',
+    category: 'herbs',
+    description: 'Hardy perennial. One of the easiest herbs for Scotland.',
+    planting: {
+      sowIndoorsMonths: [3, 4],
+      sowOutdoorsMonths: [4, 5],
+      transplantMonths: [5, 6],
+      harvestMonths: [4, 5, 6, 7, 8, 9, 10],
+      daysToHarvest: { min: 60, max: 90 }
+    },
+    care: {
+      sun: 'partial-shade',
+      water: 'moderate',
+      spacing: { between: 20, rows: 30 },
+      depth: 1,
+      difficulty: 'beginner',
+      tips: [
+        'Completely hardy - survives any Scottish winter',
+        'Divide clumps every few years',
+        'Flowers are edible too'
+      ]
+    },
+    companionPlants: ['Carrots', 'Tomatoes', 'Roses'],
+    avoidPlants: []
+  },
+  {
     id: 'rosemary',
     name: 'Rosemary',
     category: 'herbs',
-    description: 'Woody perennial herb. Drought tolerant once established.',
+    description: 'Woody perennial herb. Needs sheltered spot in Scotland.',
     planting: {
       sowIndoorsMonths: [3, 4],
       sowOutdoorsMonths: [],
-      transplantMonths: [5, 6, 9, 10],
+      transplantMonths: [5, 6, 9],
       harvestMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       daysToHarvest: { min: 365, max: 730 }
     },
@@ -986,9 +1148,9 @@ export const vegetables: Vegetable[] = [
       depth: 0.5,
       difficulty: 'beginner',
       tips: [
-        'Prefers poor, well-drained soil',
-        'Protect from cold winds',
-        'Prune after flowering'
+        'Needs sheltered spot from cold winds',
+        'Good drainage essential',
+        'Can struggle in harsh Scottish winters'
       ]
     },
     companionPlants: ['Beans', 'Cabbage', 'Carrots', 'Sage'],
@@ -998,7 +1160,7 @@ export const vegetables: Vegetable[] = [
     id: 'thyme',
     name: 'Thyme',
     category: 'herbs',
-    description: 'Low-growing perennial herb. Many varieties available.',
+    description: 'Low-growing perennial herb. Hardy in Scotland.',
     planting: {
       sowIndoorsMonths: [3, 4],
       sowOutdoorsMonths: [5, 6],
@@ -1014,11 +1176,67 @@ export const vegetables: Vegetable[] = [
       difficulty: 'beginner',
       tips: [
         'Needs well-drained soil',
-        'Trim after flowering',
-        'Replace every 3-4 years'
+        'Hardy enough for Scottish gardens',
+        'Trim after flowering'
       ]
     },
     companionPlants: ['Cabbage', 'Tomatoes', 'Aubergine'],
+    avoidPlants: []
+  },
+
+  // ============ OTHER SCOTTISH FAVORITES ============
+  {
+    id: 'rhubarb',
+    name: 'Rhubarb',
+    category: 'root-vegetables',
+    description: 'Perennial vegetable (used as fruit). Thrives in Scottish climate!',
+    planting: {
+      sowIndoorsMonths: [],
+      sowOutdoorsMonths: [3, 4, 10, 11],
+      transplantMonths: [3, 4, 10, 11],
+      harvestMonths: [4, 5, 6, 7],
+      daysToHarvest: { min: 365, max: 730 }
+    },
+    care: {
+      sun: 'partial-shade',
+      water: 'moderate',
+      spacing: { between: 90, rows: 90 },
+      depth: 5,
+      difficulty: 'beginner',
+      tips: [
+        'Perfect for Scottish climate',
+        'Dont harvest first year',
+        'Force for earlier, sweeter stems'
+      ]
+    },
+    companionPlants: ['Garlic', 'Onions'],
+    avoidPlants: []
+  },
+  {
+    id: 'sea-kale',
+    name: 'Sea Kale',
+    category: 'leafy-greens',
+    description: 'Native British perennial. Blanch shoots in spring.',
+    planting: {
+      sowIndoorsMonths: [2, 3],
+      sowOutdoorsMonths: [4],
+      transplantMonths: [4, 5],
+      harvestMonths: [3, 4, 5],
+      daysToHarvest: { min: 365, max: 730 }
+    },
+    care: {
+      sun: 'full-sun',
+      water: 'moderate',
+      spacing: { between: 60, rows: 60 },
+      depth: 2,
+      difficulty: 'intermediate',
+      tips: [
+        'Native to British coastlines',
+        'Force under pots for blanched shoots',
+        'Very ornamental blue-grey leaves'
+      ]
+    },
+    companionPlants: ['Beans'],
     avoidPlants: []
   }
 ]
@@ -1053,4 +1271,3 @@ export function getVegetablesForMonth(month: number, type: 'sow' | 'harvest'): V
 export function getAllCategories(): VegetableCategory[] {
   return [...new Set(vegetables.map(v => v.category))]
 }
-

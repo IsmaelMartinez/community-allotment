@@ -98,3 +98,5 @@ sessionStorage.setItem('aitor_api_token', apiToken.trim())
 - Consider IndexedDB for larger data sets
 - Evaluate real database if user accounts are added
 
+
+

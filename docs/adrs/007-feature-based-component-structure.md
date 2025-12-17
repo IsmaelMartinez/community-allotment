@@ -124,3 +124,5 @@ Current guidelines:
 - Consider component library (shadcn/ui) for consistency
 - Add barrel exports (`components/garden-planner/index.ts`)
 
+
+

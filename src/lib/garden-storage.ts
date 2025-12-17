@@ -8,18 +8,22 @@ import {
   GardenPlannerData, 
   PlannedVegetable, 
   GardenPlot,
+  GridPlot,
+  PlotCell,
+  RotationHistory,
   ExportedPlan,
   PLOT_COLORS
 } from '@/types/garden-planner'
 
 const STORAGE_KEY = 'garden-planner-data'
-const CURRENT_VERSION = 1
+const CURRENT_VERSION = 2
 
 // Default empty state
 const getDefaultData = (): GardenPlannerData => ({
   version: CURRENT_VERSION,
   currentPlanId: null,
-  plans: []
+  plans: [],
+  rotationHistory: []
 })
 
 /**
@@ -71,11 +75,18 @@ export function saveGardenData(data: GardenPlannerData): boolean {
  * Migrate data from older versions
  */
 function migrateData(data: GardenPlannerData): GardenPlannerData {
-  // Add migration logic here as schema evolves
-  return {
-    ...data,
-    version: CURRENT_VERSION
+  let migratedData = { ...data }
+  
+  // Migrate v1 to v2: add rotationHistory
+  if (migratedData.version < 2) {
+    migratedData = {
+      ...migratedData,
+      version: 2,
+      rotationHistory: []
+    }
   }
+  
+  return migratedData
 }
 
 /**
@@ -438,5 +449,148 @@ export function calculatePlanProgress(plan: GardenPlan): {
     withPlots,
     completionPercentage: percentage
   }
+}
+
+// ==================== GRID PLOT OPERATIONS ====================
+
+/**
+ * Create a new grid plot with initialized cells
+ */
+export function createGridPlot(
+  name: string, 
+  gridRows: number = 3, 
+  gridCols: number = 4,
+  width: number = 2, 
+  length: number = 4
+): GridPlot {
+  const plotId = generateId()
+  const cells: PlotCell[] = []
+  
+  // Initialize empty cells
+  for (let row = 0; row < gridRows; row++) {
+    for (let col = 0; col < gridCols; col++) {
+      cells.push({
+        id: `${plotId}-${row}-${col}`,
+        plotId,
+        row,
+        col,
+        vegetableId: undefined,
+        plantedYear: undefined
+      })
+    }
+  }
+  
+  return {
+    id: plotId,
+    name,
+    width,
+    length,
+    color: PLOT_COLORS[Math.floor(Math.random() * PLOT_COLORS.length)],
+    sortOrder: 0,
+    gridRows,
+    gridCols,
+    cells
+  }
+}
+
+/**
+ * Check if a plot is a grid plot
+ */
+export function isGridPlot(plot: GardenPlot): plot is GridPlot {
+  return 'cells' in plot && 'gridRows' in plot && 'gridCols' in plot
+}
+
+/**
+ * Assign a vegetable to a cell in a grid plot
+ */
+export function assignVegetableToCell(
+  data: GardenPlannerData,
+  planId: string,
+  plotId: string,
+  cellId: string,
+  vegetableId: string | undefined,
+  year?: number
+): GardenPlannerData {
+  const plan = getPlanById(data, planId)
+  if (!plan) return data
+
+  const updatedPlots = plan.plots.map(plot => {
+    if (plot.id !== plotId || !isGridPlot(plot)) return plot
+    
+    return {
+      ...plot,
+      cells: plot.cells.map(cell => 
+        cell.id === cellId 
+          ? { ...cell, vegetableId, plantedYear: year || new Date().getFullYear() }
+          : cell
+      )
+    }
+  })
+
+  return updatePlan(data, planId, { plots: updatedPlots })
+}
+
+/**
+ * Clear a cell in a grid plot
+ */
+export function clearCell(
+  data: GardenPlannerData,
+  planId: string,
+  plotId: string,
+  cellId: string
+): GardenPlannerData {
+  return assignVegetableToCell(data, planId, plotId, cellId, undefined)
+}
+
+/**
+ * Get all cells for a plot
+ */
+export function getCellsForPlot(plan: GardenPlan, plotId: string): PlotCell[] {
+  const plot = plan.plots.find(p => p.id === plotId)
+  if (!plot || !isGridPlot(plot)) return []
+  return plot.cells
+}
+
+// ==================== ROTATION HISTORY OPERATIONS ====================
+
+/**
+ * Add or update rotation history for a plot/year
+ */
+export function updateRotationHistory(
+  data: GardenPlannerData,
+  history: RotationHistory
+): GardenPlannerData {
+  // Remove existing entry for same plot/year if exists
+  const filtered = data.rotationHistory.filter(
+    h => !(h.plotId === history.plotId && h.year === history.year)
+  )
+  
+  return {
+    ...data,
+    rotationHistory: [...filtered, history]
+  }
+}
+
+/**
+ * Get rotation history for a specific plot
+ */
+export function getRotationHistoryForPlot(
+  data: GardenPlannerData,
+  plotId: string
+): RotationHistory[] {
+  return data.rotationHistory
+    .filter(h => h.plotId === plotId)
+    .sort((a, b) => b.year - a.year)
+}
+
+/**
+ * Get the most recent rotation group for a plot
+ */
+export function getLastRotationGroup(
+  data: GardenPlannerData,
+  plotId: string
+): RotationHistory | undefined {
+  const history = getRotationHistoryForPlot(data, plotId)
+  return history[0]
 }
 

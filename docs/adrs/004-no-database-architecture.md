@@ -95,3 +95,5 @@ This decision should be revisited if:
 - Real-time features needed (need WebSockets + database)
 - Analytics/reporting required (need queryable database)
 
+
+

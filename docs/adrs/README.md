@@ -29,3 +29,5 @@ Each ADR follows this structure:
 | [009](009-client-side-state-management.md) | React Built-in State Management | Accepted |
 | [010](010-static-content-pages.md) | Static Content Pages Pattern | Accepted |
 
+
+

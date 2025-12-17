@@ -107,3 +107,5 @@ module.exports = {
 - Consistent spacing using Tailwind's scale (4, 6, 8, etc.)
 - Lucide icons used throughout for consistent iconography
 
+
+

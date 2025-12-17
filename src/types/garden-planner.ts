@@ -95,6 +95,74 @@ export interface GardenPlot {
   sortOrder: number              // Order in list
 }
 
+// ============ GRID PLOT TYPES ============
+
+// Cell within a grid plot
+export interface PlotCell {
+  id: string              // Format: "{plotId}-{row}-{col}"
+  plotId: string          // Reference to parent plot
+  row: number
+  col: number
+  vegetableId?: string    // Reference to Vegetable.id
+  plantedYear?: number    // Year this was planted (for rotation tracking)
+}
+
+// Grid-enabled plot (extends existing GardenPlot)
+export interface GridPlot extends GardenPlot {
+  gridRows: number        // Number of rows in grid
+  gridCols: number        // Number of columns in grid
+  cells: PlotCell[]       // All cells in this plot
+}
+
+// Rotation tracking
+export type RotationGroup = 
+  | 'brassicas'    // Cabbage family
+  | 'legumes'      // Beans, peas
+  | 'roots'        // Carrots, parsnips, beetroot
+  | 'solanaceae'   // Tomatoes, peppers, potatoes
+  | 'alliums'      // Onions, garlic, leeks
+  | 'cucurbits'    // Squash, courgettes, cucumber
+  | 'permanent'    // Perennial herbs
+
+export interface RotationHistory {
+  plotId: string
+  year: number
+  rotationGroup: RotationGroup
+  vegetables: string[]    // IDs of vegetables planted
+}
+
+// Validation results
+export interface PlacementValidation {
+  isValid: boolean
+  warnings: PlacementWarning[]
+  suggestions: string[]   // Helpful tips
+  compatibility: 'good' | 'neutral' | 'bad'
+}
+
+export interface PlacementWarning {
+  type: 'avoid' | 'rotation' | 'spacing'
+  severity: 'error' | 'warning' | 'info'
+  message: string
+  conflictingPlant?: string
+  affectedCells?: string[]
+}
+
+// Auto-fill options
+export interface AutoFillOptions {
+  strategy: 'rotation-first' | 'companion-first' | 'balanced'
+  difficultyFilter: 'beginner' | 'all'
+  respectExisting: boolean
+}
+
+// Gap filler suggestion
+export interface GapSuggestion {
+  vegetableId: string
+  reason: string
+  score: number           // 0-100 suitability
+  quickGrow: boolean      // < 45 days to harvest
+  canPlantNow: boolean    // Based on current month
+}
+
 // Complete garden plan
 export interface GardenPlan {
   id: string
@@ -113,10 +181,11 @@ export interface GardenPlannerData {
   version: number                // Schema version for migrations
   currentPlanId: string | null   // Currently selected plan
   plans: GardenPlan[]
+  rotationHistory: RotationHistory[]  // Crop rotation tracking
 }
 
 // View modes for the planner
-export type PlannerViewMode = 'list' | 'plot' | 'calendar'
+export type PlannerViewMode = 'list' | 'plot' | 'calendar' | 'grid'
 
 // Filter options for vegetable selector
 export interface VegetableFilters {
