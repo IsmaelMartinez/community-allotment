@@ -5,32 +5,7 @@ test.describe('Homepage and Navigation', () => {
     await page.goto('/');
 
     await expect(page).toHaveTitle(/Community Allotment/);
-    await expect(page.getByRole('heading', { name: /Welcome to Community Allotment Association/ })).toBeVisible();
-  });
-
-  test('should navigate to announcements page', async ({ page }) => {
-    await page.goto('/');
-
-    // Look for navigation link to announcements (exact match in header)
-    const announcementsLink = page.getByRole('link', { name: 'Announcements', exact: true });
-    if (await announcementsLink.isVisible()) {
-      await announcementsLink.click();
-      await expect(page).toHaveURL('/announcements');
-      await expect(page.getByRole('heading', { name: '📢 Community Announcements' })).toBeVisible();
-    }
-  });
-
-  test('should navigate to admin page', async ({ page }) => {
-    await page.goto('/');
-
-    // Look for navigation link to admin
-    const adminLink = page.getByRole('link', { name: /Admin/ });
-    if (await adminLink.isVisible()) {
-      // Directly navigate to test mode instead of clicking first
-      await page.goto('/admin');
-      await expect(page).toHaveURL('/admin');
-      await expect(page.getByRole('heading', { name: '🔧 Admin Dashboard' })).toBeVisible();
-    }
+    await expect(page.getByRole('heading', { name: /Welcome to Community Allotment/ })).toBeVisible();
   });
 
   test('should navigate to AI advisor page', async ({ page }) => {
@@ -44,14 +19,14 @@ test.describe('Homepage and Navigation', () => {
     }
   });
 
-  test('should navigate to calendar page', async ({ page }) => {
+  test('should navigate to garden planner page', async ({ page }) => {
     await page.goto('/');
 
-    // Look for navigation link to calendar (exact match in header)
-    const calendarLink = page.getByRole('link', { name: 'Calendar', exact: true });
-    if (await calendarLink.isVisible()) {
-      await calendarLink.click();
-      await expect(page).toHaveURL('/calendar');
+    // Look for navigation link to garden planner
+    const gardenPlannerLink = page.getByRole('link', { name: 'Garden Planner', exact: true });
+    if (await gardenPlannerLink.isVisible()) {
+      await gardenPlannerLink.click();
+      await expect(page).toHaveURL('/garden-planner');
     }
   });
 

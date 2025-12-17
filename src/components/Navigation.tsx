@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Shield, Menu, X, Book, ChevronDown, Users, Recycle, RotateCcw } from 'lucide-react'
+import { Menu, X, Book, ChevronDown, Users, Recycle, RotateCcw } from 'lucide-react'
 
 const navLinks = [
   { href: '/', label: 'Home' },
-  { href: '/announcements', label: 'Announcements' },
-  { href: '/calendar', label: 'Calendar' },
   { href: '/garden-planner', label: 'Garden Planner' },
   { href: '/ai-advisor', label: 'Aitor' },
 ]
@@ -117,11 +115,6 @@ export default function Navigation() {
               )}
             </div>
             
-            {/* Admin Navigation */}
-            <Link href="/admin" className="hover:text-primary-200 flex items-center space-x-1 transition">
-              <Shield className="w-4 h-4" />
-              <span>Admin</span>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -188,15 +181,6 @@ export default function Navigation() {
                 )}
               </div>
               
-              {/* Admin Navigation */}
-              <Link 
-                href="/admin" 
-                className="hover:text-primary-200 hover:bg-primary-700 px-3 py-2 rounded-lg flex items-center space-x-2 transition"
-                onClick={closeMobileMenu}
-              >
-                <Shield className="w-4 h-4" />
-                <span>Admin</span>
-              </Link>
             </div>
           </div>
         )}

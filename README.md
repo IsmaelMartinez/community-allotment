@@ -1,8 +1,8 @@
-# 🌱 Community Allotment App - Where Gardens Get Social! 
+# 🌱 Community Allotment App - Your Personal Garden Companion! 
 
-*Because managing an allotment community shouldn't be harder than growing tomatoes in winter!*
+*Because planning a garden shouldn't be harder than growing tomatoes in winter!*
 
-Welcome to the most delightfully overengineered solution to the age-old problem of "Did anyone mention when the compost delivery is arriving?" Now featuring **actual AI** (not just your neighbor Dave pretending to know about soil pH).
+Welcome to your personal digital garden assistant. Plan your plot, get AI-powered advice, and learn proven growing techniques—all in one place.
 
 ## 🤖 AI-Generated Code Disclaimer
 
@@ -12,13 +12,11 @@ This serves as an example of what's possible when AI agents have access to devel
 
 ## 🎉 What Does This Thing Actually Do?
 
-Ever been to a community allotment meeting? Remember that chaos when someone mentioned bark chips and everyone suddenly became a logistics expert? Well, we've digitized that beautiful madness!
-
-### 📢 The Announcement Zone
-- **🚚 Delivery Alerts**: "The mulch truck is coming! Hide your children and small garden tools!"
-- **📝 Seed Orders**: Coordinate group buys because apparently we all need 47 varieties of lettuce
-- **💡 Garden Wisdom**: Monthly tips like "Maybe stop watering your cactus collection"
-- **🎉 Social Shenanigans**: BBQs, workshops, and the annual "Who Grew The Weirdest Vegetable" contest
+### 🗺️ Garden Planner
+Design your perfect plot with our interactive garden planner:
+- **Visual Grid Layout**: Plan your beds and see your garden come to life
+- **Crop Management**: Track what you're growing and where
+- **Smart Suggestions**: Get recommendations for filling gaps in your garden
 
 ### 🤖 Your New AI Garden Buddy
 Think of it as having a horticultural genius in your pocket, except this one won't judge you for killing that "supposedly unkillable" succulent. Ask it anything:
@@ -26,8 +24,11 @@ Think of it as having a horticultural genius in your pocket, except this one won
 - "Is this normal plant behavior or should I call an exorcist?"
 - "What's this green fuzzy stuff, and should I be worried?"
 
-### 📅 Calendar of Garden Chaos
-Never again forget that it's "Prune The Roses Week" or miss the legendary community potluck where someone always brings that surprisingly delicious beetroot cake (trust us, it's better than it sounds).
+### 📚 Growing Guides
+Learn proven techniques from our comprehensive guides:
+- **Companion Planting**: Discover which plants thrive together
+- **Composting**: Turn garden waste into black gold
+- **Crop Rotation**: Keep your soil healthy year after year
 
 ## 🛠️ Built With Love (And Probably Too Much Coffee)
 
@@ -73,14 +74,16 @@ src/
 │   ├── layout.tsx              # Root layout with navigation
 │   ├── page.tsx                # Home page with overview
 │   ├── globals.css             # Global styles
-│   ├── announcements/
-│   │   └── page.tsx            # Announcements listing and filtering
+│   ├── garden-planner/
+│   │   └── page.tsx            # Interactive garden planning tool
 │   ├── ai-advisor/
 │   │   └── page.tsx            # AI-powered plant advice chat
-│   ├── calendar/
-│   │   └── page.tsx            # Interactive calendar with events
-│   └── admin/
-│       └── page.tsx            # Admin dashboard for management
+│   ├── companion-planting/
+│   │   └── page.tsx            # Companion planting guide
+│   ├── composting/
+│   │   └── page.tsx            # Composting guide
+│   └── crop-rotation/
+│       └── page.tsx            # Crop rotation guide
 ```
 
 ## 🎨 The Pretty Stuff (Design System)
@@ -99,33 +102,31 @@ We've got colors! We've got components! We've got enough CSS classes to make you
 ### Home Sweet Home (`/`)
 Your digital allotment entrance hall. Includes a virtual welcome mat and everything you need to feel at home.
 
-### The Announcement Board (`/announcements`)
-Think village noticeboard, but with better typography and fewer thumbtacks.
+### Garden Planner (`/garden-planner`)
+Your interactive plot planning tool. Design beds, place crops, and visualize your garden layout.
 
 ### AI Plant Whisperer (`/ai-advisor`)
 Your personal garden guru that never sleeps, judges, or asks for payment in homegrown vegetables.
 
-### The Social Calendar (`/calendar`)
-Never again miss the Great Slug Hunt of 2025 or forget it's National Compost Appreciation Day.
-
-### The Control Room (`/admin`)
-Where the magic happens and the announcements get born. Admin access required (sorry, regular plot holders).
+### Growing Guides
+- **Companion Planting** (`/companion-planting`): Learn which plants help each other thrive
+- **Composting** (`/composting`): Master the art of turning waste into garden gold
+- **Crop Rotation** (`/crop-rotation`): Keep your soil healthy with smart rotation planning
 
 ## 🔮 Future Dreams and Schemes
 
 *Because every good project needs unrealistic expectations*
 
 ### Coming Eventually™
-- **Actual Database**: No more JSON files pretending to be professional storage
-- **Push Notifications**: "URGENT: The tomatoes are staging a revolt!"
 - **Weather Integration**: So the AI can judge your watering schedule with actual meteorological data
-- **Mobile App**: For when you need to check announcements while standing in your actual allotment
+- **Mobile App**: For when you need garden advice while standing in your actual allotment
 - **Multi-language Support**: Because plants grow everywhere
+- **Garden Data Persistence**: Cloud sync for your garden plans
 
 ### Pie-in-the-Sky Features
 - **Plant Disease Photo Recognition**: Point, shoot, panic appropriately
 - **Automated Seasonal Tips**: The AI becomes your personal garden calendar
-- **Community Marketplace**: "Will trade zucchini for literally anything else"
+- **Community Features**: Share plans and connect with fellow gardeners
 
 ## 🐛 Known Issues (The Hall of Shame)
 
