@@ -26,8 +26,10 @@ src/
 │   ├── Navigation.tsx              # Shared global component
 │   ├── GuideCTA.tsx                # Shared CTA component for guides
 │   └── garden-planner/             # Feature-specific folder
+│       ├── BedOverview.tsx         # Overview grid showing all beds at a glance
+│       ├── GapSuggestions.tsx      # AI-powered gap fill suggestions
 │       ├── GardenGrid.tsx          # Main grid component with plant selection
-│       └── GapSuggestions.tsx      # AI-powered gap fill suggestions
+│       └── UnifiedCalendar.tsx     # Planting calendar across all beds
 ├── app/
 │   ├── garden-planner/
 │   │   └── page.tsx               # Main garden planner with beds, grid, calendar
@@ -46,6 +48,8 @@ src/
 ```typescript
 // src/app/garden-planner/page.tsx
 import GardenGrid from '@/components/garden-planner/GardenGrid'
+import BedOverview from '@/components/garden-planner/BedOverview'
+import UnifiedCalendar from '@/components/garden-planner/UnifiedCalendar'
 // GapSuggestions imported when AI suggestions are needed
 ```
 

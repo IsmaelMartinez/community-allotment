@@ -105,7 +105,7 @@ Your digital allotment entrance hall. Includes a virtual welcome mat and everyth
 ### Garden Planner (`/garden-planner`)
 Your interactive plot planning tool. Design beds, place crops, and visualize your garden layout.
 
-### AI Plant Whisperer (`/ai-advisor`)
+### Aitor - AI Garden Advisor (`/ai-advisor`)
 Your personal garden guru that never sleeps, judges, or asks for payment in homegrown vegetables.
 
 ### Growing Guides
@@ -164,15 +164,18 @@ To set up:
 
 ### 📄 **License**
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+This project uses a **custom non-commercial license** for third parties - see the [LICENSE](./LICENSE) file for details.
 
-**What this means:**
+**What this means for you:**
 
 - ✅ Use it for your community allotment, garden club, or personal projects
 - ✅ Learn from the code and improve your programming skills  
 - ✅ Contribute improvements back to this project
 - ✅ Modify and customize for your specific needs
-- ✅ Commercial use is allowed
+- ✅ Educational and research use is allowed
+- ❌ Commercial use by third parties is **not permitted** without a separate license
+
+**Note:** The copyright holder retains full commercial rights. For commercial licensing inquiries, see the LICENSE file for contact information.
 
 ---
 

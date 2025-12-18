@@ -20,25 +20,35 @@ Implement a **hybrid data persistence strategy** with two approaches:
 
 ### 1. Client-Side localStorage (Garden Planner)
 
+The garden planner uses direct localStorage for simplicity:
+
 ```typescript
-// src/lib/garden-storage.ts
-const STORAGE_KEY = 'garden-planner-data'
+// src/app/garden-planner/page.tsx
+const STORAGE_KEY = 'garden-beds-2025'
 
-export function loadGardenData(): GardenPlannerData {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  return stored ? JSON.parse(stored) : getDefaultData()
-}
+// Load from localStorage
+useEffect(() => {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (saved) {
+    const parsed = JSON.parse(saved)
+    setData(parsed)
+  }
+}, [])
 
-export function saveGardenData(data: GardenPlannerData): boolean {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  return true
-}
+// Save to localStorage  
+useEffect(() => {
+  if (data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  }
+}, [data])
 ```
 
-**Use case**: Personal garden plans, user preferences
-**Features**: Auto-save, export/import to JSON files
+**Use case**: Personal garden bed layouts with grid-based planting
+**Features**: Auto-save on change, simple year-based storage key
 
-### 3. Session Storage (API Tokens)
+**Note**: A more comprehensive storage utility exists in `src/lib/garden-storage.ts` with `GardenPlannerData` type supporting multiple plans, export/import, and rotation history. The current page uses a simpler approach suited to its immediate needs.
+
+### 2. Session Storage (API Tokens)
 
 ```typescript
 // AI Advisor page

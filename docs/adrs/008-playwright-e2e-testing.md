@@ -34,6 +34,11 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  // Currently testing Chromium only
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+
   webServer: {
     command: 'PORT=3000 npm run dev',
     url: 'http://localhost:3000',
@@ -93,7 +98,7 @@ test('navigation works', async ({ page }) => {
 - **Parallel execution** - Fast test runs with 10 workers
 - **Auto-waiting** - Built-in smart waiting for elements
 - **Debugging tools** - UI mode, trace viewer, headed mode
-- **Cross-browser support** - Can test Chrome, Firefox, Safari
+- **Cross-browser capable** - Currently testing Chromium only; Firefox/Safari can be added via config
 - **API testing** - Can test API routes directly
 
 ### Negative
