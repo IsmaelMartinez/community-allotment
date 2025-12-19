@@ -1,13 +1,13 @@
-# Multi-Provider AI Integration Research: OpenAI + Gemini 2.5 Flash
+# Multi-Provider AI Integration Research: OpenAI + Gemini 3 Flash
 
 ## 1. Executive Summary
 
-This research document analyzes the feasibility and implementation strategy for adding **Google Gemini 2.5 Flash** support to AItor (the AI gardening advisor), alongside the existing OpenAI integration. The goal is to provide users with provider choice and potentially offer "free credits" through Gemini's generous free tier.
+This research document analyzes the feasibility and implementation strategy for adding **Google Gemini 3 Flash** support to AItor (the AI gardening advisor), alongside the existing OpenAI integration. The goal is to provide users with provider choice and potentially offer "free credits" through Gemini's generous free tier.
 
 ### Key Findings
 
 1. **Current State**: AItor is tightly coupled to OpenAI's API with hardcoded endpoints, models, and token validation
-2. **Opportunity**: Gemini 2.5 Flash offers a substantial free tier (15 RPM, 1M tokens/day) that could provide free usage without billing
+2. **Opportunity**: Gemini 3 Flash offers a substantial free tier (15 RPM, 1M tokens/day) that could provide free usage without billing
 3. **Integration Path**: Google provides an OpenAI-compatible endpoint, minimizing code changes
 4. **Dependency**: Full "free credits" with usage tracking requires user management (Clerk) - planned for v2/v3
 
@@ -146,7 +146,7 @@ Content-Type: application/json
 
 ```typescript
 // Endpoint
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIza...
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=AIza...
 
 // Headers
 Content-Type: application/json
@@ -192,7 +192,7 @@ Content-Type: application/json
 
 // Request Body - IDENTICAL to OpenAI!
 {
-  "model": "gemini-2.5-flash",
+  "model": "gemini-3-flash-preview",
   "messages": [
     { "role": "system", "content": "You are a helpful assistant." },
     { "role": "user", "content": "Hello!" }
@@ -257,7 +257,7 @@ Content-Type: application/json
 ```typescript
 // Uses SAME format as OpenAI - no changes needed!
 {
-  "model": "gemini-2.5-flash",
+  "model": "gemini-3-flash-preview",
   "messages": [{
     "role": "user",
     "content": [
@@ -278,12 +278,12 @@ Content-Type: application/json
 
 | Model | Context Window | Best For | Multimodal |
 |-------|---------------|----------|------------|
-| `gemini-2.5-flash` | 1M tokens | Fast, general purpose | Yes (images, video, audio) |
-| `gemini-2.5-flash-thinking` | 32K tokens | Complex reasoning | Yes |
+| `gemini-3-flash-preview` | 1M tokens | Fast, frontier-class performance | Yes (images, video, audio) |
+| `gemini-3-pro-preview` | 1M tokens | State-of-the-art reasoning | Yes |
 | `gemini-1.5-flash` | 1M tokens | Production stable | Yes |
 | `gemini-1.5-pro` | 2M tokens | Advanced tasks | Yes |
 
-**Recommendation for AItor**: Use `gemini-2.5-flash` for both text and vision (single model simplifies logic).
+**Recommendation for AItor**: Use `gemini-3-flash-preview` for both text and vision (single model simplifies logic).
 
 ### 3.4 Token Format Differences
 
@@ -310,7 +310,7 @@ const PROVIDERS = {
   },
   gemini: {
     endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-    models: { text: 'gemini-2.5-flash', vision: 'gemini-2.5-flash' },
+    models: { text: 'gemini-3-flash-preview', vision: 'gemini-3-flash-preview' },
     tokenPattern: /^AIza[a-zA-Z0-9\-_]{35,}$/
   }
 }
@@ -374,7 +374,7 @@ import { openai } from '@ai-sdk/openai'
 import { google } from '@ai-sdk/google'
 
 const result = await generateText({
-  model: provider === 'gemini' ? google('gemini-2.5-flash') : openai('gpt-4o-mini'),
+  model: provider === 'gemini' ? google('gemini-3-flash-preview') : openai('gpt-4o-mini'),
   messages,
   system: AITOR_SYSTEM_PROMPT
 })
@@ -504,7 +504,7 @@ function checkRateLimit(ip: string): boolean {
 
 **Average cost per AItor query**: $0.001 - $0.02 depending on image inclusion
 
-### 6.2 Gemini 2.5 Flash Pricing
+### 6.2 Gemini 3 Flash Pricing
 
 | Tier | Input Cost | Output Cost | Rate Limits |
 |------|-----------|-------------|-------------|
@@ -622,7 +622,7 @@ export const PROVIDERS: Record<AIProvider, ProviderConfig> = {
   },
   gemini: {
     endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-    models: { text: 'gemini-2.5-flash', vision: 'gemini-2.5-flash' },
+    models: { text: 'gemini-3-flash-preview', vision: 'gemini-3-flash-preview' },
     tokenPattern: /^AIza[a-zA-Z0-9\-_]{35,}$/,
     tokenHelp: 'https://aistudio.google.com/app/apikey'
   }
@@ -687,7 +687,7 @@ const headers = {
 // 4. Add provider selector in settings
 <select value={provider} onChange={(e) => setProvider(e.target.value as AIProvider)}>
   <option value="openai">OpenAI (GPT-4o)</option>
-  <option value="gemini">Google Gemini 2.5 Flash</option>
+  <option value="gemini">Google Gemini 3 Flash</option>
 </select>
 ```
 
@@ -860,7 +860,7 @@ CLERK_WEBHOOK_SECRET=whsec_xxx
 | 2024-12-18 | Use Gemini OpenAI-compatible endpoint | Minimizes code changes while enabling Gemini support |
 | 2024-12-18 | Defer free credits to v2/v3 | Requires Clerk for proper usage tracking |
 | 2024-12-18 | BYOK model for both providers in v1 | Maintains current security model |
-| 2024-12-18 | Single model for Gemini (text + vision) | Gemini 2.5 Flash handles both, simplifies logic |
+| 2024-12-18 | Single model for Gemini (text + vision) | Gemini 3 Flash handles both, simplifies logic |
 
 ---
 
