@@ -189,20 +189,21 @@ export default function AllotmentGrid({ onBedSelect, selectedBed }: AllotmentGri
         <div className="text-center text-gray-500 text-xs font-bold mb-1">↑ NORTH</div>
         
         <ReactGridLayout
-          className="layout"
-          layout={configToLayout(items, isEditing)}
-          cols={cols}
-          rowHeight={50}
-          width={width - 16}
-          margin={[6, 6]}
-          containerPadding={[0, 0]}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          onLayoutChange={(layout: any) => handleLayoutChange(layout)}
-          isDraggable={isEditing}
-          isResizable={isEditing}
-          compactType={null}
-          preventCollision={false}
-          useCSSTransforms={true}
+          {...({
+            className: "layout",
+            layout: configToLayout(items, isEditing),
+            cols: cols,
+            rowHeight: 50,
+            width: width - 16,
+            margin: [6, 6],
+            containerPadding: [0, 0],
+            onLayoutChange: (layout: LayoutItem[]) => handleLayoutChange([...layout]),
+            isDraggable: isEditing,
+            isResizable: isEditing,
+            compactType: null,
+            preventCollision: false,
+            useCSSTransforms: true,
+          } as unknown as React.ComponentProps<typeof ReactGridLayout>)}
         >
           {items.map(item => (
             <div 

@@ -64,10 +64,7 @@ test.describe('Garden Planner', () => {
   test('should display plant selection when clicking grid cell', async ({ page }) => {
     await page.goto('/garden-planner')
     
-    // Click on a grid cell (they're buttons in the grid)
-    const gridCell = page.locator('button').filter({ hasText: '' }).first()
-    
-    // Find and click an empty cell
+    // Find and click an empty cell in the grid
     const emptyCells = page.locator('div[class*="grid"] button')
     const firstEmptyCell = emptyCells.first()
     
