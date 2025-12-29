@@ -11,7 +11,7 @@ import {
   Loader2
 } from 'lucide-react'
 import { useAllotment } from '@/hooks/useAllotment'
-import { generateRotationPlanFromData } from '@/lib/rotation-planner'
+import { generateRotationPlanFromData } from '@/lib/rotation'
 
 // Extracted components
 import Year2026Planning from '@/components/plan-history/Year2026Planning'

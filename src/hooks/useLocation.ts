@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { UserLocation } from '@/types'
+import type { UserLocation } from '@/types/api'
 
 interface UseLocationReturn {
   userLocation: UserLocation | null

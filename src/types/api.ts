@@ -1,5 +1,7 @@
 /**
- * Shared type definitions for the Community Allotment application
+ * API and UI Type Definitions
+ * 
+ * Types for API responses, chat/AI advisor, user location, and UI component props.
  */
 
 // API Response Types
@@ -52,4 +54,5 @@ export interface MarkdownComponentProps {
   className?: string
   href?: string
 }
+
 

@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserLocation } from '@/types'
+import type { UserLocation } from '@/types/api'
 
 interface LocationStatusProps {
   userLocation: UserLocation | null

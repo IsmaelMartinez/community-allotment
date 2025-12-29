@@ -17,7 +17,7 @@ import {
   getRotationGroup, 
   calculateRotationScore,
   ROTATION_GROUPS
-} from './crop-rotation'
+} from './rotation'
 
 interface CandidateScore {
   vegetableId: string

@@ -6,10 +6,13 @@ Accepted
 ## Date
 2025-01-01 (retrospective)
 
+## Last Updated
+2025-12-27 (codebase simplification)
+
 ## Context
 
 The application has different data persistence needs:
-1. **Garden Plans**: Personal user data that should persist but is user-specific
+1. **Allotment Data**: Personal user data that should persist but is user-specific
 2. **AI Chat**: Temporary session data with conversation history
 
 We needed a strategy that works without a traditional database while serving these different needs.
@@ -18,35 +21,29 @@ We needed a strategy that works without a traditional database while serving the
 
 Implement a **hybrid data persistence strategy** with two approaches:
 
-### 1. Client-Side localStorage (Garden Planner)
+### 1. Client-Side localStorage (Allotment Storage)
 
-The garden planner uses direct localStorage for simplicity:
+The allotment page uses a unified storage service (`src/services/allotment-storage.ts`):
 
 ```typescript
-// src/app/garden-planner/page.tsx
-const STORAGE_KEY = 'garden-beds-2025'
+// Unified storage with schema validation
+import { 
+  loadAllotmentData, 
+  saveAllotmentData,
+  AllotmentData 
+} from '@/services/allotment-storage'
 
-// Load from localStorage
-useEffect(() => {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  if (saved) {
-    const parsed = JSON.parse(saved)
-    setData(parsed)
-  }
-}, [])
-
-// Save to localStorage  
-useEffect(() => {
-  if (data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  }
-}, [data])
+// The useAllotment hook manages state and persistence
+const { data, isLoading, addPlanting } = useAllotment()
 ```
 
-**Use case**: Personal garden bed layouts with grid-based planting
-**Features**: Auto-save on change, simple year-based storage key
-
-**Note**: A more comprehensive storage utility exists in `src/lib/garden-storage.ts` with `GardenPlannerData` type supporting multiple plans, export/import, and rotation history. The current page uses a simpler approach suited to its immediate needs.
+**Use case**: Personal allotment layouts, seasonal plantings, rotation history
+**Features**: 
+- Schema validation and auto-repair
+- Debounced saves to prevent excessive writes
+- Multi-tab synchronization
+- Version migration for schema changes
+- Generic storage utilities for other localStorage needs
 
 ### 2. Session Storage (API Tokens)
 

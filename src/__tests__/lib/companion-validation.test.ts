@@ -243,3 +243,4 @@ describe('calculateCompanionScore', () => {
 
 
 
+

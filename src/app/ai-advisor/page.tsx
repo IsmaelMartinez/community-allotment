@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Settings, Leaf } from 'lucide-react'
-import type { ChatMessage as ChatMessageType } from '@/types'
+import type { ChatMessage as ChatMessageType } from '@/types/api'
 
 // Extracted hooks
 import { useLocation } from '@/hooks/useLocation'

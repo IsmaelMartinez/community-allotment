@@ -84,3 +84,4 @@ export default function BedItem({ item, isSelected, isEditing }: BedItemProps) {
 
 
 
+

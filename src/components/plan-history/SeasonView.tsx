@@ -2,7 +2,7 @@
 
 import { Calendar, AlertCircle, AlertTriangle } from 'lucide-react'
 import { BED_COLORS } from '@/data/allotment-layout'
-import { ROTATION_GROUP_DISPLAY } from '@/lib/rotation-planner'
+import { ROTATION_GROUP_DISPLAY } from '@/lib/rotation'
 import { getVegetableById } from '@/lib/vegetable-database'
 import { RotationGroup, PlantingSuccess, PhysicalBedId, PhysicalBed } from '@/types/garden-planner'
 import { SeasonRecord } from '@/types/unified-allotment'

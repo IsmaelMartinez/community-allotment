@@ -3,7 +3,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import Image from 'next/image'
-import type { ChatMessage as ChatMessageType, MarkdownComponentProps } from '@/types'
+import type { ChatMessage as ChatMessageType, MarkdownComponentProps } from '@/types/api'
 
 // Markdown components for styling
 const markdownComponents = {

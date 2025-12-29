@@ -9,7 +9,7 @@ import {
   buildRotationHistoryEntry,
   getRotationSummary,
   calculateRotationScore
-} from '@/lib/crop-rotation'
+} from '@/lib/rotation'
 import { RotationHistory, GridPlot } from '@/types/garden-planner'
 
 // Mock getVegetableById

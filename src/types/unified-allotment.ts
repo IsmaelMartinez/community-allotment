@@ -6,18 +6,15 @@
  * - allotment-layout.ts (hardcoded layout)
  * - historical-plans.ts (hardcoded seasons)
  * - garden-storage.ts (localStorage with different IDs)
+ * 
+ * Note: Types like PhysicalBedId, RotationGroup, PhysicalBed, etc. should be
+ * imported directly from '@/types/garden-planner'
  */
 
-// Re-export canonical types from garden-planner
-export type {
+import type {
   PhysicalBedId,
-  BedStatus,
   RotationGroup,
   PlantingSuccess,
-} from './garden-planner'
-
-// Re-export layout types we're keeping
-export type {
   PhysicalBed,
   PermanentPlanting,
   InfrastructureItem,
@@ -53,9 +50,9 @@ export interface AllotmentMeta {
  * Rarely changes - beds, trees, infrastructure
  */
 export interface AllotmentLayoutData {
-  beds: import('./garden-planner').PhysicalBed[]
-  permanentPlantings: import('./garden-planner').PermanentPlanting[]
-  infrastructure: import('./garden-planner').InfrastructureItem[]
+  beds: PhysicalBed[]
+  permanentPlantings: PermanentPlanting[]
+  infrastructure: InfrastructureItem[]
 }
 
 // ============ SEASON RECORDS ============
@@ -81,8 +78,8 @@ export interface SeasonRecord {
  * One bed's plantings for a season
  */
 export interface BedSeason {
-  bedId: import('./garden-planner').PhysicalBedId
-  rotationGroup: import('./garden-planner').RotationGroup
+  bedId: PhysicalBedId
+  rotationGroup: RotationGroup
   plantings: Planting[]              // Multiple plantings per bed
 }
 
@@ -103,7 +100,7 @@ export interface Planting {
   harvestDate?: string               // ISO date string
   
   // Outcome tracking
-  success?: import('./garden-planner').PlantingSuccess
+  success?: PlantingSuccess
   notes?: string                     // Free-form notes
   
   // Optional quantity

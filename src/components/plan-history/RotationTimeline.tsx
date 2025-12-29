@@ -1,7 +1,7 @@
 'use client'
 
 import { BED_COLORS } from '@/data/allotment-layout'
-import { ROTATION_GROUP_DISPLAY } from '@/lib/rotation-planner'
+import { ROTATION_GROUP_DISPLAY } from '@/lib/rotation'
 import { PhysicalBedId, RotationGroup, RotationPlan, PhysicalBed } from '@/types/garden-planner'
 import { SeasonRecord } from '@/types/unified-allotment'
 

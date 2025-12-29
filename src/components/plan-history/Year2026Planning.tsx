@@ -2,7 +2,7 @@
 
 import { Lightbulb, AlertTriangle, AlertCircle, CheckCircle2, Leaf, ArrowRight } from 'lucide-react'
 import { BED_COLORS } from '@/data/allotment-layout'
-import { ROTATION_GROUP_DISPLAY, PROBLEM_BED_SUGGESTIONS } from '@/lib/rotation-planner'
+import { ROTATION_GROUP_DISPLAY, PROBLEM_BED_SUGGESTIONS } from '@/lib/rotation'
 import { getVegetableById } from '@/lib/vegetable-database'
 import { RotationPlan } from '@/types/garden-planner'
 
