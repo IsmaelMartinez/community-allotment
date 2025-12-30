@@ -91,7 +91,7 @@ function AddPlantingForm({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
         >
           <option value="">Select a vegetable...</option>
-          {vegetables.map(v => (
+          {[...vegetables].sort((a, b) => a.name.localeCompare(b.name)).map(v => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>

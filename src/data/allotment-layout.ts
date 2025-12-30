@@ -331,7 +331,7 @@ export interface GridItemConfig {
 // Represents the allotment from North (top) to South (bottom)
 export const DEFAULT_GRID_LAYOUT: GridItemConfig[] = [
   // === ROW 0: Top row - E, Wildish, Compost ===
-  { i: 'E', x: 0, y: 0, w: 2, h: 2, label: 'E', type: 'bed', icon: '🫘', color: '#f87171', bedId: 'E', isProblem: true },
+  { i: 'E', x: 0, y: 0, w: 2, h: 2, label: 'E', type: 'bed', icon: '🫘', color: '#a3e635', bedId: 'E' },
   { i: 'wildish', x: 2, y: 0, w: 4, h: 2, label: 'Wildish', type: 'area', icon: '🌿', color: '#d1d5db' },
   { i: 'compost', x: 6, y: 0, w: 3, h: 2, label: 'Compost', type: 'infrastructure', icon: '🗑️', color: '#fcd34d' },
 
@@ -344,7 +344,7 @@ export const DEFAULT_GRID_LAYOUT: GridItemConfig[] = [
   { i: 'A', x: 8, y: 2, w: 2, h: 2, label: 'A', type: 'bed', icon: '🫛', color: '#22c55e', bedId: 'A' },
 
   // === ROW 4-7: C + main B beds + Raspberries ===
-  { i: 'C', x: 0, y: 4, w: 2, h: 3, label: 'C', type: 'bed', icon: '🌳', color: '#ef4444', bedId: 'C', isProblem: true },
+  { i: 'C', x: 0, y: 4, w: 2, h: 3, label: 'C', type: 'bed', icon: '🌳', color: '#86efac', bedId: 'C' },
   { i: 'straw-damson', x: 0, y: 7, w: 2, h: 1, label: 'Straw/Damson', type: 'perennial', icon: '🍓', color: '#fbcfe8' },
   { i: 'B2', x: 2, y: 4, w: 2, h: 4, label: 'B2', type: 'bed', icon: '🧄', color: '#f59e0b', bedId: 'B2' },
   { i: 'B1', x: 4, y: 4, w: 2, h: 4, label: 'B1', type: 'bed', icon: '🥬', color: '#3b82f6', bedId: 'B1' },
