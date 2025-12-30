@@ -79,16 +79,20 @@ export default function Navigation() {
                 onMouseEnter={() => setIsGuidesOpen(true)}
                 className="flex items-center space-x-1 hover:text-primary-200 transition"
                 aria-expanded={isGuidesOpen}
-                aria-haspopup="true"
+                aria-haspopup="menu"
+                aria-controls="growing-guides-menu"
               >
-                <Book className="w-4 h-4" />
+                <Book className="w-4 h-4" aria-hidden="true" />
                 <span>Growing Guides</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isGuidesOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 transition-transform ${isGuidesOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
-              
+
               {/* Dropdown Menu */}
               {isGuidesOpen && (
-                <div 
+                <div
+                  id="growing-guides-menu"
+                  role="menu"
+                  aria-label="Growing guides submenu"
                   className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-50"
                   onMouseLeave={() => setIsGuidesOpen(false)}
                 >
@@ -98,10 +102,11 @@ export default function Navigation() {
                       <Link
                         key={guide.href}
                         href={guide.href}
+                        role="menuitem"
                         className="flex items-start px-4 py-3 hover:bg-primary-50 transition group"
                         onClick={() => setIsGuidesOpen(false)}
                       >
-                        <IconComponent className="w-5 h-5 text-primary-600 mt-0.5 mr-3 flex-shrink-0" />
+                        <IconComponent className="w-5 h-5 text-primary-600 mt-0.5 mr-3 flex-shrink-0" aria-hidden="true" />
                         <div>
                           <div className="text-gray-800 font-medium group-hover:text-primary-600 transition">
                             {guide.label}

@@ -19,8 +19,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-primary-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white"
+        >
+          Skip to main content
+        </a>
         <Navigation />
-        <main className="min-h-screen bg-gray-50">
+        <main id="main-content" className="min-h-screen bg-gray-50" tabIndex={-1}>
           <ErrorBoundaryProvider>
             {children}
           </ErrorBoundaryProvider>
