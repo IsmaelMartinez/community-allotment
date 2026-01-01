@@ -22,14 +22,106 @@ import {
 import { BED_COLORS } from '@/data/allotment-layout'
 import { getVegetableById, vegetables } from '@/lib/vegetable-database'
 import { checkCompanionCompatibility } from '@/lib/companion-validation'
-import { PhysicalBedId } from '@/types/garden-planner'
+import { getNextRotationGroup, ROTATION_GROUP_DISPLAY } from '@/lib/rotation'
+import { PhysicalBedId, RotationGroup } from '@/types/garden-planner'
 import { Planting, NewPlanting } from '@/types/unified-allotment'
 import { useAllotment } from '@/hooks/useAllotment'
+import { myVarieties } from '@/data/my-varieties'
+import { Calendar, Package, ArrowRight } from 'lucide-react'
 import AllotmentGrid from '@/components/allotment/AllotmentGrid'
 import Dialog, { ConfirmDialog } from '@/components/ui/Dialog'
 import DataManagement from '@/components/allotment/DataManagement'
 import SaveIndicator from '@/components/ui/SaveIndicator'
 import BedNotes from '@/components/allotment/BedNotes'
+
+// Seasonal phase based on month
+const SEASONAL_PHASES: Record<number, { name: string; emoji: string; action: string }> = {
+  0: { name: 'Planning Season', emoji: '❄️', action: 'Order seeds & plan rotation' },
+  1: { name: 'Early Spring', emoji: '🌱', action: 'Start seeds indoors' },
+  2: { name: 'Spring Prep', emoji: '🌿', action: 'Prepare beds & sow early crops' },
+  3: { name: 'Planting Time', emoji: '🌻', action: 'Transplant & direct sow' },
+  4: { name: 'Growing Season', emoji: '☀️', action: 'Maintain & water' },
+  5: { name: 'Peak Season', emoji: '🌽', action: 'Harvest & succession plant' },
+  6: { name: 'Midsummer', emoji: '🍅', action: 'Harvest & preserve' },
+  7: { name: 'Late Summer', emoji: '🎃', action: 'Harvest main crops' },
+  8: { name: 'Autumn', emoji: '🍂', action: 'Clear beds & plant garlic' },
+  9: { name: 'Late Autumn', emoji: '🥕', action: 'Lift roots & protect crops' },
+  10: { name: 'Early Winter', emoji: '🥬', action: 'Harvest hardy crops' },
+  11: { name: 'Rest Period', emoji: '❄️', action: 'Rest & reflect' }
+}
+
+// Season Status Widget Component
+function SeasonStatusWidget({
+  bedsNeedingRotation,
+  totalRotationBeds,
+  currentYear
+}: {
+  bedsNeedingRotation: number
+  totalRotationBeds: number
+  currentYear: number
+}) {
+  const month = new Date().getMonth()
+  const phase = SEASONAL_PHASES[month]
+  const monthName = new Date().toLocaleDateString('en-GB', { month: 'long' })
+
+  // Calculate seeds needed (varieties used in past years that user might need to reorder)
+  const varietiesUsedLastYear = myVarieties.filter(v => v.yearsUsed.includes(currentYear - 1))
+
+  return (
+    <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl p-4 shadow-lg">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{phase.emoji}</span>
+          <div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 opacity-80" />
+              <span className="font-medium">{monthName}</span>
+              <span className="text-emerald-200">•</span>
+              <span className="text-emerald-100">{phase.name}</span>
+            </div>
+            <p className="text-sm text-emerald-100 mt-0.5">{phase.action}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 text-sm">
+          <Link
+            href="/seeds"
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition"
+          >
+            <Package className="w-4 h-4" />
+            <span>{varietiesUsedLastYear.length} varieties to check</span>
+          </Link>
+
+          <Link
+            href="/plan-history"
+            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition"
+          >
+            <ArrowRight className="w-4 h-4" />
+            <span>{bedsNeedingRotation}/{totalRotationBeds} beds need rotation</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Helper to get rotation info for a bed
+function getRotationIndicator(
+  bedId: PhysicalBedId,
+  currentYear: number,
+  seasons: { year: number; beds: { bedId: PhysicalBedId; rotationGroup: RotationGroup }[] }[]
+): { lastYear: RotationGroup; suggested: RotationGroup } | null {
+  // Find last year's rotation group from seasons
+  const lastYearSeason = seasons.find(s => s.year === currentYear - 1)
+  const lastYearBed = lastYearSeason?.beds.find(b => b.bedId === bedId)
+
+  if (!lastYearBed?.rotationGroup) return null
+
+  const lastYear = lastYearBed.rotationGroup
+  const suggested = getNextRotationGroup(lastYear)
+
+  return { lastYear, suggested }
+}
 
 // Add Planting Form (used inside Dialog)
 function AddPlantingForm({ 
@@ -566,6 +658,15 @@ export default function AllotmentPage() {
         )}
       </div>
 
+      {/* Season Status Widget */}
+      <div className="max-w-6xl mx-auto px-4 py-2">
+        <SeasonStatusWidget
+          bedsNeedingRotation={getRotationBeds().filter(b => getPlantings(b.id).length === 0).length}
+          totalRotationBeds={getRotationBeds().length}
+          currentYear={selectedYear}
+        />
+      </div>
+
       <main className="max-w-6xl mx-auto px-4 py-2">
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Layout */}
@@ -611,6 +712,34 @@ export default function AllotmentPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Rotation Indicator for rotation beds */}
+                {selectedBedData.status === 'rotation' && (() => {
+                  const rotationInfo = getRotationIndicator(
+                    selectedBedId!,
+                    selectedYear,
+                    data?.seasons || []
+                  )
+                  if (!rotationInfo) return null
+                  const lastDisplay = ROTATION_GROUP_DISPLAY[rotationInfo.lastYear]
+                  const nextDisplay = ROTATION_GROUP_DISPLAY[rotationInfo.suggested]
+                  return (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                      <div className="text-xs text-amber-800 font-medium mb-1">Rotation Guide</div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="flex items-center gap-1">
+                          <span>{lastDisplay?.emoji}</span>
+                          <span className="text-gray-600">{selectedYear - 1}: {lastDisplay?.name}</span>
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-amber-500" />
+                        <span className="flex items-center gap-1 font-medium text-amber-700">
+                          <span>{nextDisplay?.emoji}</span>
+                          <span>{selectedYear}: {nextDisplay?.name}</span>
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 <p className="text-sm text-gray-600 mb-4">{selectedBedData.description}</p>
 

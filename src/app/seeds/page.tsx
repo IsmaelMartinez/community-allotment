@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sprout, ChevronDown, ChevronRight, ExternalLink, Package, Check, ShoppingCart } from 'lucide-react'
+import { Sprout, ChevronDown, ChevronRight, ExternalLink, Package, Check, ShoppingCart, AlertTriangle } from 'lucide-react'
 import { myVarieties, getSuppliers, getTotalSpendForYear } from '@/data/my-varieties'
 import { getVegetableById } from '@/lib/vegetable-database'
 
@@ -204,9 +204,17 @@ export default function SeedsPage() {
                                   <span className="text-red-500">Not used yet</span>
                                 )}
                               </div>
-                              {v.notes && (
-                                <div className="text-sm text-gray-400 italic">{v.notes}</div>
-                              )}
+                              {v.notes && (() => {
+                                const isWarning = /rotten|poor|failed|bad|damaged|diseased/i.test(v.notes)
+                                return (
+                                  <div className={`text-sm italic flex items-start gap-1 ${
+                                    isWarning ? 'text-red-500 font-medium' : 'text-gray-400'
+                                  }`}>
+                                    {isWarning && <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />}
+                                    {v.notes}
+                                  </div>
+                                )
+                              })()}
                             </div>
                           </div>
                         )
