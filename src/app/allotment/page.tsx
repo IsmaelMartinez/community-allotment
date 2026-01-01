@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { 
-  Map, 
-  Sprout, 
+import {
+  Map,
+  Sprout,
   History,
   AlertTriangle,
   Leaf,
@@ -15,7 +15,9 @@ import {
   Loader2,
   TreeDeciduous,
   Users,
-  Check
+  Check,
+  Droplets,
+  Sun
 } from 'lucide-react'
 import { BED_COLORS } from '@/data/allotment-layout'
 import { getVegetableById, vegetables } from '@/lib/vegetable-database'
@@ -228,7 +230,26 @@ function PlantingCard({
             {planting.varietyName && (
               <div className="text-xs text-gray-500">{planting.varietyName}</div>
             )}
-            
+
+            {/* Care requirements */}
+            {veg && (
+              <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                <span className="flex items-center gap-0.5" title={`Water: ${veg.care.water}`}>
+                  <Droplets className={`w-3 h-3 ${
+                    veg.care.water === 'high' ? 'text-blue-500' :
+                    veg.care.water === 'moderate' ? 'text-blue-400' : 'text-blue-300'
+                  }`} />
+                  {veg.care.water === 'high' ? 'High' : veg.care.water === 'moderate' ? 'Med' : 'Low'}
+                </span>
+                <span className="flex items-center gap-0.5" title={`Sun: ${veg.care.sun}`}>
+                  <Sun className={`w-3 h-3 ${
+                    veg.care.sun === 'full-sun' ? 'text-yellow-500' : 'text-yellow-400'
+                  }`} />
+                  {veg.care.sun === 'full-sun' ? 'Full' : 'Partial'}
+                </span>
+              </div>
+            )}
+
             {/* Companion Status */}
             {goods.length > 0 && (
               <div className="flex items-center gap-1 mt-1">

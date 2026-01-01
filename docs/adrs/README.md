@@ -28,6 +28,7 @@ Each ADR follows this structure:
 | [008](008-playwright-e2e-testing.md) | Playwright for E2E Testing | Accepted |
 | [009](009-client-side-state-management.md) | React Built-in State Management | Accepted |
 | [010](010-static-content-pages.md) | Static Content Pages Pattern | Accepted |
+| [011](011-seed-variety-tracking.md) | Seed Variety Tracking | Accepted |
 
 
 

@@ -38,12 +38,21 @@ const { data, isLoading, addPlanting } = useAllotment()
 ```
 
 **Use case**: Personal allotment layouts, seasonal plantings, rotation history
-**Features**: 
+**Features**:
 - Schema validation and auto-repair
 - Debounced saves to prevent excessive writes
 - Multi-tab synchronization
 - Version migration for schema changes
 - Generic storage utilities for other localStorage needs
+
+### Additional localStorage Keys
+
+Other features use simple localStorage for state persistence:
+
+| Key | Purpose | Data Structure |
+|-----|---------|----------------|
+| `community-allotment-seeds-have` | Seed inventory tracking | `string[]` (variety IDs user has) |
+| `allotment-grid-layout` | Custom bed grid positions | Layout positions for react-grid-layout |
 
 ### 2. Session Storage (API Tokens)
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Sprout, ChevronDown, ChevronRight, ExternalLink, Package } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Sprout, ChevronDown, ChevronRight, ExternalLink, Package, Check, ShoppingCart } from 'lucide-react'
 import { myVarieties, getSuppliers, getTotalSpendForYear } from '@/data/my-varieties'
 import { getVegetableById } from '@/lib/vegetable-database'
 
@@ -12,8 +12,44 @@ const SUPPLIER_URLS: Record<string, string> = {
   'Garden Organic': 'https://www.gardenorganic.org.uk/shop/seeds',
 }
 
+const SEEDS_STORAGE_KEY = 'community-allotment-seeds-have'
+
 export default function SeedsPage() {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+  const [haveSeeds, setHaveSeeds] = useState<Set<string>>(new Set())
+  const [mounted, setMounted] = useState(false)
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    try {
+      const saved = localStorage.getItem(SEEDS_STORAGE_KEY)
+      if (saved) {
+        setHaveSeeds(new Set(JSON.parse(saved)))
+      }
+    } catch (e) {
+      console.warn('Failed to load seeds status:', e)
+    }
+  }, [])
+
+  // Save to localStorage when haveSeeds changes
+  useEffect(() => {
+    if (!mounted) return
+    try {
+      localStorage.setItem(SEEDS_STORAGE_KEY, JSON.stringify([...haveSeeds]))
+    } catch (e) {
+      console.warn('Failed to save seeds status:', e)
+    }
+  }, [haveSeeds, mounted])
+
+  const toggleHaveSeeds = (id: string) => {
+    setHaveSeeds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   // Group varieties by vegetable
   const grouped = myVarieties.reduce((acc, v) => {
@@ -28,6 +64,9 @@ export default function SeedsPage() {
   const suppliers = getSuppliers()
   const spend2024 = getTotalSpendForYear(2024)
   const spend2025 = getTotalSpendForYear(2025)
+
+  const haveCount = haveSeeds.size
+  const needCount = myVarieties.length - haveCount
 
   const toggleGroup = (name: string) => {
     const next = new Set(expandedGroups)
@@ -58,12 +97,12 @@ export default function SeedsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-lg p-4 shadow text-center">
-            <div className="text-2xl font-bold text-green-600">{myVarieties.length}</div>
-            <div className="text-sm text-gray-500">Varieties</div>
+            <div className="text-2xl font-bold text-green-600">{haveCount}</div>
+            <div className="text-sm text-gray-500">Have Seeds</div>
           </div>
           <div className="bg-white rounded-lg p-4 shadow text-center">
-            <div className="text-2xl font-bold text-green-600">{groupNames.length}</div>
-            <div className="text-sm text-gray-500">Vegetables</div>
+            <div className="text-2xl font-bold text-orange-500">{needCount}</div>
+            <div className="text-sm text-gray-500">Need to Order</div>
           </div>
           <div className="bg-white rounded-lg p-4 shadow text-center">
             <div className="text-2xl font-bold text-amber-600">£{spend2024.toFixed(2)}</div>
@@ -119,43 +158,59 @@ export default function SeedsPage() {
                 {isExpanded && (
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100">
                     <div className="space-y-3">
-                      {varieties.map(v => (
-                        <div key={v.id} className="pl-7">
-                          <div className="flex flex-wrap items-baseline gap-2">
-                            <span className="font-medium text-gray-700">{v.name}</span>
-                            {v.supplier && (
-                              <span className="text-sm text-gray-500">
-                                {SUPPLIER_URLS[v.supplier] ? (
-                                  <a
-                                    href={SUPPLIER_URLS[v.supplier]}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-green-600 hover:underline inline-flex items-center gap-1"
-                                  >
-                                    {v.supplier}
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                ) : (
-                                  v.supplier
+                      {varieties.map(v => {
+                        const hasIt = haveSeeds.has(v.id)
+                        return (
+                          <div key={v.id} className={`pl-7 flex items-start gap-3 ${!hasIt ? 'opacity-75' : ''}`}>
+                            <button
+                              onClick={() => toggleHaveSeeds(v.id)}
+                              className={`mt-0.5 p-1 rounded ${
+                                hasIt
+                                  ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                                  : 'bg-orange-100 text-orange-500 hover:bg-orange-200'
+                              }`}
+                              title={hasIt ? 'Have seeds - click to mark as needed' : 'Need seeds - click to mark as have'}
+                            >
+                              {hasIt ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
+                            </button>
+                            <div className="flex-1">
+                              <div className="flex flex-wrap items-baseline gap-2">
+                                <span className="font-medium text-gray-700">{v.name}</span>
+                                {v.supplier && (
+                                  <span className="text-sm text-gray-500">
+                                    {SUPPLIER_URLS[v.supplier] ? (
+                                      <a
+                                        href={SUPPLIER_URLS[v.supplier]}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-green-600 hover:underline inline-flex items-center gap-1"
+                                      >
+                                        {v.supplier}
+                                        <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    ) : (
+                                      v.supplier
+                                    )}
+                                  </span>
                                 )}
-                              </span>
-                            )}
-                            {v.price && (
-                              <span className="text-sm text-amber-600">£{v.price.toFixed(2)}</span>
-                            )}
+                                {v.price && (
+                                  <span className="text-sm text-amber-600">£{v.price.toFixed(2)}</span>
+                                )}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {v.yearsUsed.length > 0 ? (
+                                  <span>Used: {v.yearsUsed.join(', ')}</span>
+                                ) : (
+                                  <span className="text-red-500">Not used yet</span>
+                                )}
+                              </div>
+                              {v.notes && (
+                                <div className="text-sm text-gray-400 italic">{v.notes}</div>
+                              )}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {v.yearsUsed.length > 0 ? (
-                              <span>Used: {v.yearsUsed.join(', ')}</span>
-                            ) : (
-                              <span className="text-red-500">Not used yet</span>
-                            )}
-                          </div>
-                          {v.notes && (
-                            <div className="text-sm text-gray-400 italic">{v.notes}</div>
-                          )}
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )}
