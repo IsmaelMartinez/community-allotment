@@ -153,18 +153,18 @@ export default function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="fixed inset-0 z-[100] overflow-y-auto"
       role="presentation"
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 transition-opacity"
+        className="fixed inset-0 bg-black/50 transition-opacity z-[100]"
         onClick={handleBackdropClick}
         aria-hidden="true"
       />
 
       {/* Centering wrapper */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="relative z-[101] flex min-h-full items-center justify-center p-4">
 
       {/* Dialog */}
       <div
@@ -174,7 +174,7 @@ export default function Dialog({
         aria-labelledby={titleId.current}
         aria-describedby={description ? descriptionId.current : undefined}
         tabIndex={-1}
-        className={`relative bg-white rounded-xl shadow-xl w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] flex flex-col focus:outline-none`}
+        className={`relative z-[102] bg-white rounded-xl shadow-xl w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] flex flex-col focus:outline-none`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 shrink-0">
