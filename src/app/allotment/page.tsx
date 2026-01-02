@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Map,
@@ -124,12 +124,12 @@ function getRotationIndicator(
 }
 
 // Add Planting Form (used inside Dialog)
-function AddPlantingForm({ 
-  onSubmit, 
+function AddPlantingForm({
+  onSubmit,
   onCancel,
   existingPlantings = []
-}: { 
-  onSubmit: (planting: NewPlanting) => void 
+}: {
+  onSubmit: (planting: NewPlanting) => void
   onCancel: () => void
   existingPlantings?: Planting[]
 }) {
@@ -143,6 +143,16 @@ function AddPlantingForm({
     ? myVarieties.filter(v => v.vegetableId === vegetableId)
     : []
   const selectedVegetable = vegetableId ? getVegetableById(vegetableId) : null
+
+  // Track 3C: Pre-select variety if only one match exists
+  useEffect(() => {
+    if (matchingVarieties.length === 1 && !varietyName) {
+      setVarietyName(matchingVarieties[0].name)
+    } else if (matchingVarieties.length === 0) {
+      // Clear variety if changing to vegetable with no varieties
+      setVarietyName('')
+    }
+  }, [vegetableId, matchingVarieties.length])
 
   // Calculate companion compatibility with existing plantings
   const companionInfo = vegetableId ? (() => {
@@ -470,10 +480,12 @@ export default function AllotmentPage() {
     addBedNote,
     updateBedNote,
     removeBedNote,
+    updateRotationGroup,
   } = useAllotment()
 
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [yearToDelete, setYearToDelete] = useState<number | null>(null)
+  const [showAutoRotateDialog, setShowAutoRotateDialog] = useState(false)
 
   // Get available years and add next year option
   const availableYears = getYears()
@@ -520,6 +532,53 @@ export default function AllotmentPage() {
 
   const handleCreateNextYear = () => {
     createSeason(nextYear, `Planning for ${nextYear} season`)
+  }
+
+  const handleAutoRotate = (addSuggestedVegetables: boolean) => {
+    if (!selectedBedId) return
+
+    const rotateInfo = getAutoRotateInfo()
+    if (!rotateInfo) return
+
+    // Update the bed's rotation group to the suggested one
+    updateRotationGroup(selectedBedId, rotateInfo.suggestedGroup)
+
+    // Optionally add suggested vegetables
+    if (addSuggestedVegetables && rotateInfo.suggestedVegetables.length > 0) {
+      rotateInfo.suggestedVegetables.slice(0, 3).forEach(vegId => {
+        const newPlanting: NewPlanting = {
+          vegetableId: vegId,
+        }
+        addPlanting(selectedBedId, newPlanting)
+      })
+    }
+
+    setShowAutoRotateDialog(false)
+  }
+
+  // Get info for auto-rotate dialog (without changing selected year to avoid re-render loop)
+  const getAutoRotateInfo = () => {
+    if (!selectedBedId || !data) return null
+
+    const previousYear = selectedYear - 1
+
+    // Find previous year's season directly from data WITHOUT calling selectYear
+    const previousSeason = data.seasons.find(s => s.year === previousYear)
+    if (!previousSeason) return null
+
+    const previousBedSeason = previousSeason.beds.find(b => b.bedId === selectedBedId)
+    if (!previousBedSeason?.rotationGroup) return null
+
+    const previousGroup = previousBedSeason.rotationGroup
+    const suggestedGroup = getNextRotationGroup(previousGroup)
+    const suggestedVegetables = getVegetablesForRotationGroup(suggestedGroup)
+
+    return {
+      previousYear,
+      previousGroup,
+      suggestedGroup,
+      suggestedVegetables,
+    }
   }
 
   return (
@@ -798,13 +857,28 @@ export default function AllotmentPage() {
                       {selectedYear} Plantings
                     </h4>
                     {selectedBedData.status !== 'perennial' && (
-                      <button
-                        onClick={() => setShowAddDialog(true)}
-                        className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition"
-                      >
-                        <Plus className="w-3 h-3" />
-                        Add
-                      </button>
+                      <div className="flex items-center gap-1">
+                        {(() => {
+                          const rotateInfo = getAutoRotateInfo()
+                          return rotateInfo ? (
+                            <button
+                              onClick={() => setShowAutoRotateDialog(true)}
+                              className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+                              title={`Rotate from ${ROTATION_GROUP_DISPLAY[rotateInfo.previousGroup]?.name} to ${ROTATION_GROUP_DISPLAY[rotateInfo.suggestedGroup]?.name}`}
+                            >
+                              <ArrowRight className="w-3 h-3" />
+                              Auto-rotate
+                            </button>
+                          ) : null
+                        })()}
+                        <button
+                          onClick={() => setShowAddDialog(true)}
+                          className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Add
+                        </button>
+                      </div>
                     )}
                   </div>
                   
@@ -940,6 +1014,98 @@ export default function AllotmentPage() {
         cancelText="Cancel"
         variant="danger"
       />
+
+      {/* Auto-rotate Dialog */}
+      {(() => {
+        const rotateInfo = getAutoRotateInfo()
+        if (!rotateInfo || !selectedBedData) return null
+
+        const previousDisplay = ROTATION_GROUP_DISPLAY[rotateInfo.previousGroup]
+        const suggestedDisplay = ROTATION_GROUP_DISPLAY[rotateInfo.suggestedGroup]
+        const suggestedVegNames = rotateInfo.suggestedVegetables
+          .slice(0, 3)
+          .map(id => getVegetableById(id)?.name)
+          .filter(Boolean)
+
+        return (
+          <Dialog
+            isOpen={showAutoRotateDialog}
+            onClose={() => setShowAutoRotateDialog(false)}
+            title="Auto-rotate Bed for Soil Health"
+            description={`Rotate ${selectedBedData.name} to maintain healthy soil and prevent disease buildup.`}
+          >
+            <div className="space-y-4">
+              {/* Rotation Flow */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <div className="flex items-center justify-center gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl mb-1">{previousDisplay?.emoji}</div>
+                    <div className="text-sm font-medium text-gray-700">{previousDisplay?.name}</div>
+                    <div className="text-xs text-gray-500">{rotateInfo.previousYear}</div>
+                  </div>
+                  <ArrowRight className="w-6 h-6 text-emerald-600" />
+                  <div className="text-center">
+                    <div className="text-2xl mb-1">{suggestedDisplay?.emoji}</div>
+                    <div className="text-sm font-medium text-emerald-700">{suggestedDisplay?.name}</div>
+                    <div className="text-xs text-emerald-600">{selectedYear}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Why this matters */}
+              <div className="text-sm text-gray-600">
+                <p className="font-medium text-gray-700 mb-1">Why rotate?</p>
+                <p>
+                  Crop rotation prevents soil nutrient depletion and reduces pest and disease buildup.
+                  Each plant family uses different nutrients and attracts different pests.
+                </p>
+              </div>
+
+              {/* Suggested vegetables preview */}
+              {suggestedVegNames.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Suggested {suggestedDisplay?.name.toLowerCase()} to plant:
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                    {suggestedVegNames.map((name, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                        <span className="text-gray-400">•</span>
+                        <span>{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    You can add these automatically or choose your own later.
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2 pt-2">
+                <button
+                  onClick={() => handleAutoRotate(true)}
+                  className="w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-medium"
+                >
+                  Rotate & Add Suggested Plants
+                </button>
+                <button
+                  onClick={() => handleAutoRotate(false)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Just Rotate (I'll add plants myself)
+                </button>
+                <button
+                  onClick={() => setShowAutoRotateDialog(false)}
+                  className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 transition text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Dialog>
+        )
+      })()}
     </div>
   )
 }
