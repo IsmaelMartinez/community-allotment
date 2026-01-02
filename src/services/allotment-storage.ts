@@ -598,6 +598,14 @@ export function addSeason(data: AllotmentData, input: NewSeasonInput): Allotment
         ? getNextRotationGroup(previousBed.rotationGroup)
         : bed.rotationGroup || 'legumes'
 
+      // Debug logging
+      console.log(`[AUTO-ROTATE] Bed ${bed.id} for ${input.year}:`, {
+        previousYear,
+        previousRotation: previousBed?.rotationGroup,
+        newRotation: rotationGroup,
+        rotated: !!previousBed?.rotationGroup
+      })
+
       return {
         bedId: bed.id,
         rotationGroup,
