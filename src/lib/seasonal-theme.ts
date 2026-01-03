@@ -23,6 +23,9 @@ export interface SeasonalTheme {
   // Decorative element colors
   decorPrimary: string
   decorSecondary: string
+  // Background image from Unsplash
+  bgImage: string
+  bgImageCredit: { name: string; url: string }
 }
 
 /**
@@ -53,6 +56,9 @@ export function getSeasonalTheme(season: Season): SeasonalTheme {
       badgeClass: 'bg-zen-ume-100 text-zen-ume-700',
       decorPrimary: '#bc728a',  // ume-500
       decorSecondary: '#e3bfcb', // ume-300
+      // Frost on kale - calm winter allotment scene
+      bgImage: 'https://images.unsplash.com/photo-1516054575922-f0b8eeadec1a?w=1920&q=80&auto=format&fit=crop',
+      bgImageCredit: { name: 'Markus Spiske', url: 'https://unsplash.com/@markusspiske' },
     },
     spring: {
       season: 'spring',
@@ -65,6 +71,9 @@ export function getSeasonalTheme(season: Season): SeasonalTheme {
       badgeClass: 'bg-zen-sakura-100 text-zen-sakura-700',
       decorPrimary: '#e07294',  // sakura-500
       decorSecondary: '#f5c1d1', // sakura-300
+      // Cherry blossoms - delicate spring awakening
+      bgImage: 'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1920&q=80&auto=format&fit=crop',
+      bgImageCredit: { name: 'AJ', url: 'https://unsplash.com/@ajcolores' },
     },
     summer: {
       season: 'summer',
@@ -77,6 +86,9 @@ export function getSeasonalTheme(season: Season): SeasonalTheme {
       badgeClass: 'bg-zen-moss-100 text-zen-moss-700',
       decorPrimary: '#768a5e',  // moss-500
       decorSecondary: '#b5c2a4', // moss-300
+      // Lush vegetable garden - abundant summer growth
+      bgImage: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1920&q=80&auto=format&fit=crop',
+      bgImageCredit: { name: 'Markus Spiske', url: 'https://unsplash.com/@markusspiske' },
     },
     autumn: {
       season: 'autumn',
@@ -89,6 +101,9 @@ export function getSeasonalTheme(season: Season): SeasonalTheme {
       badgeClass: 'bg-zen-kitsune-100 text-zen-kitsune-700',
       decorPrimary: '#d4805a',  // kitsune-500
       decorSecondary: '#ecc2a4', // kitsune-300
+      // Autumn harvest vegetables - warm earth tones
+      bgImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80&auto=format&fit=crop',
+      bgImageCredit: { name: 'Ella Olsson', url: 'https://unsplash.com/@ellaolsson' },
     },
   }
 

@@ -11,9 +11,15 @@ const nextConfig = {
   // Asset prefix for GitHub Pages
   assetPrefix: isGitHubPages ? '/community-allotment/' : '',
   
-  // Disable image optimization for static export
+  // Image configuration
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
   
   // Trailing slash for better compatibility with static hosting
