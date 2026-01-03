@@ -101,9 +101,9 @@ export function getSeasonalTheme(season: Season): SeasonalTheme {
       badgeClass: 'bg-zen-kitsune-100 text-zen-kitsune-700',
       decorPrimary: '#d4805a',  // kitsune-500
       decorSecondary: '#ecc2a4', // kitsune-300
-      // Autumn harvest vegetables - warm earth tones
-      bgImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80&auto=format&fit=crop',
-      bgImageCredit: { name: 'Ella Olsson', url: 'https://unsplash.com/@ellaolsson' },
+      // Autumn pumpkins and squash - warm harvest scene
+      bgImage: 'https://images.unsplash.com/photo-1509622905150-fa66d3906e09?w=1920&q=80&auto=format&fit=crop',
+      bgImageCredit: { name: 'Joanna Kosinska', url: 'https://unsplash.com/@joannakosinska' },
     },
   }
 

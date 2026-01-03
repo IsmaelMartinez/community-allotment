@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { 
-  History, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  History,
+  ChevronLeft,
+  ChevronRight,
   Lightbulb,
   Sprout,
   Loader2
@@ -21,23 +21,23 @@ import RotationTimeline from '@/components/plan-history/RotationTimeline'
 export default function PlanHistoryPage() {
   const { data, isLoading, getYears } = useAllotment()
   const availableYears = getYears()
-  
+
   const [selectedYear, setSelectedYear] = useState<number | 'next'>(() => {
     return availableYears[0] || 2025
   })
-  
+
   // Calculate next planning year
   const nextPlanningYear = useMemo(() => {
     if (availableYears.length === 0) return 2026
     return Math.max(...availableYears) + 1
   }, [availableYears])
-  
+
   // Generate rotation plan for next year using unified data
   const nextYearPlan = useMemo(() => {
     if (!data) return null
     return generateRotationPlanFromData(nextPlanningYear, data)
   }, [data, nextPlanningYear])
-  
+
   // Get problem beds summary
   const problemBedsSummary = useMemo(() => {
     if (!data) return []
@@ -60,7 +60,7 @@ export default function PlanHistoryPage() {
       setSelectedYear(availableYears[0])
       return
     }
-    
+
     const currentIndex = availableYears.indexOf(selectedYear)
     if (direction === 'prev' && currentIndex < availableYears.length - 1) {
       setSelectedYear(availableYears[currentIndex + 1])
@@ -76,53 +76,57 @@ export default function PlanHistoryPage() {
   // Loading state
   if (isLoading || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-amber-600 animate-spin" />
+      <div className="min-h-screen bg-zen-stone-50 zen-texture flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-zen-kitsune-600 animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="min-h-screen bg-zen-stone-50 zen-texture">
+      <div className="container mx-auto px-4 py-10 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <History className="w-10 h-10 text-amber-600 mr-3" />
+        <header className="mb-10">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Allotment History</h1>
-              <p className="text-sm text-gray-500">Past seasons and {nextPlanningYear} planning</p>
+              <div className="flex items-baseline gap-3 mb-2">
+                <History className="w-6 h-6 text-zen-kitsune-600" />
+                <h1 className="text-zen-ink-900">History</h1>
+              </div>
+              <p className="text-zen-stone-500 text-lg">
+                Past seasons and {nextPlanningYear} planning
+              </p>
             </div>
+            <Link
+              href="/allotment"
+              className="zen-btn-secondary flex items-center gap-2"
+            >
+              <Sprout className="w-4 h-4" />
+              My Allotment
+            </Link>
           </div>
-          <Link 
-            href="/allotment"
-            className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg shadow hover:shadow-md transition"
-          >
-            <Sprout className="w-4 h-4" />
-            My Allotment
-          </Link>
-        </div>
+        </header>
 
         {/* Year Navigation */}
-        <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div className="zen-card p-4 mb-8">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigateYear('prev')}
               disabled={selectedYear === availableYears[availableYears.length - 1]}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 rounded-zen hover:bg-zen-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 text-zen-ink-600" />
             </button>
-            
-            <div className="flex items-center gap-4 flex-wrap justify-center">
+
+            <div className="flex items-center gap-3 flex-wrap justify-center">
               {availableYears.map(year => (
                 <button
                   key={year}
                   onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                  className={`px-4 py-2 rounded-zen text-sm font-medium transition ${
                     selectedYear === year
-                      ? 'bg-amber-500 text-white shadow'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-zen-kitsune-600 text-white'
+                      : 'bg-zen-stone-100 text-zen-ink-600 hover:bg-zen-stone-200'
                   }`}
                 >
                   {year}
@@ -130,10 +134,10 @@ export default function PlanHistoryPage() {
               ))}
               <button
                 onClick={() => setSelectedYear('next')}
-                className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-zen text-sm font-medium transition flex items-center gap-2 ${
                   selectedYear === 'next'
-                    ? 'bg-green-500 text-white shadow'
-                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                    ? 'bg-zen-moss-600 text-white'
+                    : 'bg-zen-moss-100 text-zen-moss-700 hover:bg-zen-moss-200'
                 }`}
               >
                 <Lightbulb className="w-4 h-4" />
@@ -144,39 +148,46 @@ export default function PlanHistoryPage() {
             <button
               onClick={() => navigateYear('next')}
               disabled={selectedYear === 'next'}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2 rounded-zen hover:bg-zen-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 text-zen-ink-600" />
             </button>
           </div>
         </div>
 
         {/* Next Year Planning View */}
         {selectedYear === 'next' && nextYearPlan && (
-          <Year2026Planning 
-            plan2026={nextYearPlan} 
-            problemBedsSummary={problemBedsSummary} 
+          <Year2026Planning
+            plan2026={nextYearPlan}
+            problemBedsSummary={problemBedsSummary}
           />
         )}
 
         {/* Historical Season View */}
         {selectedYear !== 'next' && selectedSeason && (
-          <SeasonView 
-            season={selectedSeason} 
-            year={selectedYear} 
+          <SeasonView
+            season={selectedSeason}
+            year={selectedYear}
             beds={data.layout.beds}
           />
         )}
 
         {/* Rotation Timeline */}
         {nextYearPlan && (
-          <RotationTimeline 
-            availableYears={availableYears} 
+          <RotationTimeline
+            availableYears={availableYears}
             seasons={data.seasons}
             beds={data.layout.beds}
-            plan2026={nextYearPlan} 
+            plan2026={nextYearPlan}
           />
         )}
+
+        {/* Footer */}
+        <footer className="mt-16 pt-8 border-t border-zen-stone-200 text-center">
+          <p className="text-sm text-zen-stone-400">
+            Tailored for Scottish gardens
+          </p>
+        </footer>
       </div>
     </div>
   )
